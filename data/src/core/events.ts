@@ -1,4 +1,4 @@
-// [core/events.js] 事件总线
+// [core/events.ts] 事件总线
 // 职责：on、off、callEvent 事件订阅与发布，作为各层之间的解耦通信通道
 // 不负责：具体业务逻辑
 

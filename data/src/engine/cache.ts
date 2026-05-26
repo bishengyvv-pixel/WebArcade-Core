@@ -1,4 +1,4 @@
-// [cache.js] 缓存系统 — ROM/存档文件的下载、解压、存储与检索
+// [cache.ts] 缓存系统 — ROM/存档文件的下载、解压、存储与检索
 // 职责：EJS_Cache（缓存管理）、EJS_CacheItem（缓存项）、EJS_FileItem（文件项）、EJS_Download（下载器）
 // 不负责：压缩/解压算法实现（由 compression.js 处理）、存储底层 API（由 storage.js 处理）
 
@@ -20,12 +20,11 @@ const CACHE_BLOB_CHUNK_SIZE = 50 * 1024 * 1024;
  * 5. If none of the above conditions are met, use the cached version.
  */
 class EJS_Download {
-    /**
-     * Creates an instance of EJS_Download.
-     * @param {EJS_Cache} storageCache - The cache instance to use for storing downloaded files.
-     * @param {Object} EJS - The main EmulatorJS instance.
-     */
-    constructor(storageCache = null, EJS = null) {
+    storageCache: any;
+    EJS: any;
+    debug: boolean;
+
+    constructor(storageCache: any = null, EJS: any = null) {
         this.storageCache = storageCache;
         this.EJS = EJS;
     }
@@ -116,7 +115,7 @@ class EJS_Download {
             cacheActiveText = "";
         }
         console.log("[EJS Download] Downloading " + responseType + " file: " + url + cacheActiveText);
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
             try {
                 // Check if this is a non-http(s) URL (blob:, data:, file:, etc.)
                 let urlObj;
@@ -302,14 +301,17 @@ class EJS_Download {
  * Manages a cache of files using IndexedDB for storage.
  */
 class EJS_Cache {
-    /**
-     * Creates an instance of EJS_Cache.
-     * @param {boolean} enabled - Whether caching is enabled.
-     * @param {string} databaseName - Name of the IndexedDB database to use for caching.
-     * @param {number} maxSizeMB - Maximum size of the cache in megabytes.
-     * @param {number} maxAgeMins - Maximum age of items (in minutes) before they are cleaned up.
-     */
-    constructor(enabled = true, databaseName, maxSizeMB = 4096, maxAgeMins = 7200, debug = false) {
+    enabled: boolean;
+    databaseName: string;
+    maxSizeMB: number;
+    maxAgeMins: number;
+    minAgeMins: number;
+    debug: boolean;
+    startupCleanupCompleted: boolean;
+    storage: any;
+    blobStorage: any;
+
+    constructor(enabled: boolean = true, databaseName: string, maxSizeMB: number = 4096, maxAgeMins: number = 7200, debug: boolean = false) {
         this.enabled = enabled;
         this.databaseName = databaseName;
         this.maxSizeMB = maxSizeMB;
@@ -342,12 +344,12 @@ class EJS_Cache {
 
         if (this.storage && this.blobStorage) return;
 
-        return new Promise((resolve, reject) => {
+        return new Promise<any>((resolve, reject) => {
             const indexes = ["type", "url"];
             const request = window.indexedDB.open(this.databaseName, 1);
 
             request.onupgradeneeded = (event) => {
-                const db = event.target.result;
+                const db = (event.target as IDBOpenDBRequest).result;
                 // Create metadata stores
                 const cacheStore = db.createObjectStore("cache");
                 // Create indexes for cache store if indexes array is present
@@ -419,7 +421,7 @@ class EJS_Cache {
     async putBlobEntry(key, value) {
         const objectStore = await this.getBlobObjectStore();
         if (!objectStore) return;
-        return await new Promise(resolve => {
+        return await new Promise<void>(resolve => {
             const request = objectStore.put(value, key);
             request.onsuccess = () => resolve();
             request.onerror = () => resolve();
@@ -434,7 +436,7 @@ class EJS_Cache {
     async getBlobEntry(key) {
         const objectStore = await this.getBlobObjectStore("readonly");
         if (!objectStore) return null;
-        return await new Promise(resolve => {
+        return await new Promise<void>(resolve => {
             const request = objectStore.get(key);
             request.onsuccess = () => resolve(request.result ?? null);
             request.onerror = () => resolve(null);
@@ -473,7 +475,7 @@ class EJS_Cache {
     async removeBlobEntry(key) {
         const objectStore = await this.getBlobObjectStore();
         if (!objectStore) return;
-        return await new Promise(resolve => {
+        return await new Promise<void>(resolve => {
             const request = objectStore.delete(key);
             request.onsuccess = () => resolve();
             request.onerror = () => resolve();
@@ -798,19 +800,19 @@ class EJS_Cache {
  * Contains metadata about the cached item. This class is an internal structure used by EJS_Cache.
  */
 class EJS_CacheItem {
-    /**
-     * Creates an instance of EJS_CacheItem.
-     * @param {string} key - Unique identifier for the cached item.
-     * @param {EJS_FileItem[]} files - Array of EJS_FileItem objects representing the files associated with this cache item.
-     * @param {number} added - Timestamp (in milliseconds) when the item was added to the cache.
-     * @param {string} [type="unknown"] - The type of cached content (e.g., 'core', 'ROM', 'BIOS', 'decompressed').
-     * @param {string} responseType - The response type used when downloading the content (e.g., 'arraybuffer', 'blob', 'text').
-     * @param {string} filename - The original filename of the cached content.
-     * @param {string} url - The URL from which the cached content was downloaded.
-     * @param {number|null} cacheExpiry - Timestamp (in milliseconds) indicating when the cache item should expire.
-     * @param {number} [lastAccessed=added] - Timestamp (in milliseconds) when the item was last accessed. Defaults to added.
-     */
-    constructor(key, files, added, type = "unknown", responseType, filename, url, cacheExpiry, lastAccessed = added) {
+    key: string;
+    files: EJS_FileItem[];
+    added: number;
+    lastAccessed: number;
+    type: string;
+    responseType: string;
+    filename: string;
+    url: string;
+    cacheExpiry: number | null;
+    fileSize?: number;
+    source?: string;
+
+    constructor(key: string, files: EJS_FileItem[], added: number, type: string = "unknown", responseType?: string, filename?: string, url?: string, cacheExpiry?: number | null, lastAccessed: number = added) {
         this.key = key;
         this.files = files;
         this.added = added;
@@ -842,11 +844,10 @@ class EJS_CacheItem {
  * Represents a single file within an EJS_CacheItem. Stores the filename and its raw bytes.
  */
 class EJS_FileItem {
-    /**
-     * @param {string} filename - The name of the file (e.g. "game.rom").
-     * @param {Uint8Array} bytes - The raw file contents.
-     */
-    constructor(filename, bytes) {
+    filename: string;
+    bytes: Uint8Array;
+
+    constructor(filename: string, bytes: Uint8Array) {
         this.filename = filename;
         this.bytes = bytes;
     }

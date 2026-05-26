@@ -10,6 +10,7 @@
  * their contents using web workers for better performance.
  */
 class EJS_COMPRESSION {
+    EJS: any;
     /**
      * Creates a new compression handler instance.
      *
@@ -60,7 +61,7 @@ class EJS_COMPRESSION {
             if (typeof fileCbFunc === "function") {
                 fileCbFunc("!!notCompressedData", data);
             }
-            return new Promise(resolve => resolve({ "!!notCompressedData": data }));
+            return new Promise<any>(resolve => resolve({ "!!notCompressedData": data }));
         }
         return this.decompressFile(compressed, data, updateMsg, fileCbFunc);
     }
@@ -79,7 +80,7 @@ class EJS_COMPRESSION {
      * @throws {Error} When network errors occur during file downloads
      */
     getWorkerFile(method) {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
             let path, obj;
             if (method === "7z") {
                 path = "compression/extract7z.js";
@@ -183,7 +184,7 @@ class EJS_COMPRESSION {
      * // t: 1 - Extraction complete
      */
     decompressFile(method, data, updateMsg, fileCbFunc) {
-        return new Promise(async callback => {
+        return new Promise<any>(async callback => {
             const file = await this.getWorkerFile(method);
             const worker = new Worker(URL.createObjectURL(file));
             const files = {};

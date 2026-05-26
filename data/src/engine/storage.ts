@@ -1,4 +1,4 @@
-// [storage.js] 持久化存储 — IndexedDB 封装
+// [storage.ts] 持久化存储 — IndexedDB 封装
 // 职责：EJS_STORAGE 打开/管理 IndexedDB 数据库，提供 get/put/remove/getAll 接口
 // 不负责：缓存策略与文件组织（由 cache.js 处理）
 
@@ -8,6 +8,10 @@
  * Each instance is scoped to one store name within a named database.
  */
 class EJS_STORAGE {
+    dbName: string;
+    storeName: string;
+    indexes: string[] | null;
+
     /**
      * @param {string} dbName - The IndexedDB database name to open.
      * @param {string} storeName - The object store name to use within that database.
@@ -45,7 +49,7 @@ class EJS_STORAGE {
      * @returns {Promise<IDBObjectStore|undefined>} The opened object store, or undefined on failure.
      */
     getObjectStore(mode = "readwrite") {
-        return new Promise((resolve, reject) => {
+        return new Promise<any>((resolve, reject) => {
             if (!window.indexedDB) return resolve();
             let openRequest = indexedDB.open(this.dbName, 1);
             openRequest.onerror = () => resolve();
@@ -81,7 +85,7 @@ class EJS_STORAGE {
      * @returns {Promise<any>}
      */
     get(key, indexName = null) {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
             const objectStore = await this.getObjectStore();
             if (!objectStore) return resolve();
             if (!indexName) {
@@ -110,7 +114,7 @@ class EJS_STORAGE {
      * @returns {Promise<void>}
      */
     put(key, data) {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
             const objectStore = await this.getObjectStore();
             if (!objectStore) return resolve();
             let request = objectStore.put(data, key);
@@ -127,7 +131,7 @@ class EJS_STORAGE {
      * @returns {Promise<void>}
      */
     remove(key) {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
             const objectStore = await this.getObjectStore();
             if (!objectStore) return resolve();
             let request = objectStore.delete(key);
@@ -141,7 +145,7 @@ class EJS_STORAGE {
      * @returns {Promise<Object.<string, number>>} Map of key to byte size.
      */
     getSizes() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
             if (!window.indexedDB) resolve({});
             const keys = await this.get("?EJS_KEYS!");
             if (!keys) return resolve({});
@@ -159,7 +163,7 @@ class EJS_STORAGE {
      * @returns {Promise<any[]>} Array of all stored values, excluding the key index record.
      */
     getAll() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
             if (!window.indexedDB) return resolve([]);
             const keys = await this.get("?EJS_KEYS!");
             if (!keys) return resolve([]);
@@ -177,7 +181,7 @@ class EJS_STORAGE {
      * @returns {Promise<string[]>} Array of primary keys, excluding the internal index key.
      */
     getKeys() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
             if (!window.indexedDB) return resolve([]);
             const keys = await this.get("?EJS_KEYS!");
             if (!keys) return resolve([]);
@@ -194,23 +198,23 @@ class EJS_DUMMYSTORAGE {
     constructor() {}
     /** @returns {Promise<void>} */
     addFileToDB() {
-        return new Promise(resolve => resolve());
+        return new Promise<void>(resolve => resolve());
     }
     /** @returns {Promise<undefined>} */
     get() {
-        return new Promise(resolve => resolve());
+        return new Promise<void>(resolve => resolve());
     }
     /** @returns {Promise<void>} */
     put() {
-        return new Promise(resolve => resolve());
+        return new Promise<void>(resolve => resolve());
     }
     /** @returns {Promise<void>} */
     remove() {
-        return new Promise(resolve => resolve());
+        return new Promise<void>(resolve => resolve());
     }
     /** @returns {Promise<{}>} */
     getSizes() {
-        return new Promise(resolve => resolve({}));
+        return new Promise<void>(resolve => resolve({}));
     }
 }
 

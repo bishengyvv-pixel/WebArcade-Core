@@ -1,4 +1,4 @@
-// [emulator.js] 主控制器 — 模拟生命周期编排与各层协调
+// [emulator.ts] 主控制器 — 模拟生命周期编排与各层协调
 // 职责：下载 ROM → 解压 → 选文件 → 初始化 WASM → 启动循环 → 协调 ui/ input/ core/ engine/ 各层
 // 不负责：具体 UI DOM 构建（由 ui/ 处理）、引擎内部逻辑（由 engine/GameManager.js 处理）、输入捕获（由 input/ 处理）
 

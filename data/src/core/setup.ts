@@ -1,17 +1,19 @@
-// [core/setup.js] 初始化设置
+// [core/setup.ts] 初始化设置
 // 职责：启动时的初始化配置、已弃用配置项检查与迁移提示
 // 不负责：运行时配置读写（由 core/config.js 处理）
 
 import { EJS_SHADERS } from "../engine/shaders.js";
 
 class EJS_SETUP {
-    constructor(EJS) {
+    EJS: any;
+    debug: boolean;
+
+    constructor(EJS: any) {
         this.EJS = EJS;
         this.debug = this.EJS.debug;
     }
-    log() {
+    log(...args: any[]) {
         if (!this.debug) return;
-        const args = Array.from(arguments);
         console.log.apply(console, ["[EJS_SETUP]", ...args]);
     }
     checkDeprecatedSettings() {

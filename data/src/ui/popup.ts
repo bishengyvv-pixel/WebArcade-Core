@@ -72,7 +72,7 @@ export function showInputPrompt(emu, opts) {
     const hint = opts.hint || "Enter text";
     const maxLength = opts.maxLength | 0;
     const password = !!opts.password;
-    return new Promise((resolve) => {
+    return new Promise<any>((resolve) => {
         const popups = emu.createSubPopup();
         emu.currentPopup = popups;
         emu.game.appendChild(popups[0]);

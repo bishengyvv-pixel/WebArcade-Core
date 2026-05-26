@@ -97,7 +97,7 @@ export function screenshot(emu, callback, source, format, upscale) {
 }
 
 export function takeScreenshot(emu, source, format, upscale) {
-    return new Promise((resolve) => {
+    return new Promise<any>((resolve) => {
         screenshot(emu, async (blob, returnFormat) => {
             const arrayBuffer = await blob.arrayBuffer();
             const uint8 = new Uint8Array(arrayBuffer);

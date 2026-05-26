@@ -15,10 +15,11 @@
     },
     "scripts": {
         "start": "http-server",
+        "typecheck": "tsc --noEmit",
         "minify": "node minify/minify.js",
         "build": "node build.js",
         "update": "node update.js",
-        "docs": "jsdoc data/src/*.js -d jsdoc"
+        "docs": "jsdoc data/src/*.ts -d jsdoc"
     },
     "dependencies": {
         "@node-minify/clean-css": "^10.4.0",
@@ -31,11 +32,14 @@
     },
     "devDependencies": {
         "@rollup/plugin-terser": "^1.0.0",
+        "@rollup/plugin-typescript": "^12.3.0",
         "eslint": "^10.0.2",
         "jsdoc": "^4.0.5",
         "nipplejs": "^0.10.2",
         "node-fetch": "^3.3.2",
         "rollup": "^4.59.0",
-        "socket.io": "^4.8.3"
+        "socket.io": "^4.8.3",
+        "tslib": "^2.8.1",
+        "typescript": "^6.0.3"
     }
 }

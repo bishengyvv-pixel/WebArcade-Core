@@ -1,9 +1,14 @@
-// [GameManager.js] 引擎桥接层 — WASM/RetroArch 接口封装
+// [GameManager.ts] 引擎桥接层 — WASM/RetroArch 接口封装
 // 职责：封装 Emscripten Module 的 FS、callMain、screenshot 等接口，管理模拟核心的输入输出
 // 不负责：UI 层的状态管理（由 emulator.js 协调）、文件缓存（由 cache.js 处理）
 
 class EJS_GameManager {
-    constructor(Module, EJS) {
+    EJS: any;
+    Module: any;
+    FS: any;
+    functions: Record<string, (...args: any[]) => any>;
+
+    constructor(Module: any, EJS: any) {
         this.EJS = EJS;
         this.Module = Module;
         this.FS = this.Module.FS;
@@ -71,7 +76,7 @@ class EJS_GameManager {
         }
     }
     mountFileSystems() {
-        return new Promise(async resolve => {
+        return new Promise<any>(async resolve => {
             this.mkdir("/data");
             this.mkdir("/data/saves");
             this.FS.mount(this.FS.filesystems.IDBFS, { autoPersist: true }, "/data/saves");
@@ -90,10 +95,10 @@ class EJS_GameManager {
         this.writeFile("/home/web_user/retroarch/userdata/config/" + this.EJS.defaultCoreOpts.file, output);
     }
     loadExternalFiles() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve: any, reject: any) => {
             if (this.EJS.config.externalFiles && this.EJS.config.externalFiles.constructor.name === "Object") {
                 for (const key in this.EJS.config.externalFiles) {
-                    await new Promise(async (done) => {
+                    await new Promise<void>(async (done) => {
                         try {
                             const url = this.EJS.config.externalFiles[key];
                             
@@ -231,13 +236,13 @@ IF EXIST AUTORUN.BAT CALL AUTORUN.BAT
             this.FS.unlink("/screenshot.png");
         } catch(e) {}
         this.functions.screenshot();
-        return new Promise(async resolve => {
+        return new Promise<any>(async resolve => {
             while (1) {
                 try {
                     this.FS.stat("/screenshot.png");
                     return resolve(this.FS.readFile("/screenshot.png"));
                 } catch(e) {}
-                await new Promise(res => setTimeout(res, 50));
+                await new Promise<void>(res => setTimeout(res, 50));
             }
         })
     }
@@ -360,7 +365,7 @@ IF EXIST AUTORUN.BAT CALL AUTORUN.BAT
         return (fileNames.length === 1) ? baseFileName + "-0.cue" : baseFileName + ".m3u";
     }
     loadPpssppAssets() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve: any, reject: any) => {
             try {
                 const cacheItem = await this.EJS.downloader.downloadFile("data/cores/ppsspp-assets.zip", this.EJS.downloadType.core.name, "GET", {}, null, null, null, 30000, "arraybuffer", false, this.EJS.downloadType.core.dontCache);
 

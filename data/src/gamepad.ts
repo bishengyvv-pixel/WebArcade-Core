@@ -1,8 +1,26 @@
-// [gamepad.js] 物理手柄管理 — Gamepad API 封装
+// [gamepad.ts] 物理手柄管理 — Gamepad API 封装
 // 职责：检测手柄连接/断开、轮询手柄状态、提供按钮标签映射
 // 不负责：游戏内的手柄输入处理（由 input/gamepad.js 处理）、虚拟手柄 DOM（由 ui/gamepad.js 处理）
 
+interface GamepadState {
+    axes: number[];
+    buttons: Record<number, number | { pressed: boolean }>;
+    index: number;
+    id: string;
+}
+
+declare global {
+    interface Navigator {
+        webkitGetGamepads?: () => (Gamepad | null)[];
+    }
+}
+
 class GamepadHandler {
+    buttonLabels: Record<number, string>;
+    gamepads: (GamepadState | null)[];
+    listeners: Record<string, (arg: any) => void>;
+    timeout: ReturnType<typeof setTimeout> | null;
+
     constructor() {
         this.buttonLabels = {
             0: 'BUTTON_1',
@@ -28,7 +46,7 @@ class GamepadHandler {
         this.loop();
     }
     terminate() {
-        window.clearTimeout(this.timeout);
+        window.clearTimeout(this.timeout as number);
     }
     getGamepads() {
         return navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
@@ -38,22 +56,23 @@ class GamepadHandler {
         this.timeout = setTimeout(this.loop.bind(this), 10);
     }
     updateGamepadState() {
-        let gamepads = Array.from(this.getGamepads());
+        const rawGamepads: any = this.getGamepads();
+        let gamepads: any[] = Array.from(rawGamepads);
         if (!gamepads) return;
-        if (!Array.isArray(gamepads) && gamepads.length) {
-            let gp = [];
-            for (let i=0; i<gamepads.length; i++) {
-                gp.push(gamepads[i]);
+        if (rawGamepads && !Array.isArray(rawGamepads) && rawGamepads.length) {
+            let gp: any[] = [];
+            for (let i=0; i<rawGamepads.length; i++) {
+                gp.push(rawGamepads[i]);
             }
             gamepads = gp;
-        } else if (!Array.isArray(gamepads)) return;
+        } else if (!Array.isArray(rawGamepads)) return;
 
-        gamepads.forEach((gamepad, index) => {
+        gamepads.forEach((gamepad: any, index: number) => {
             if (!gamepad) return;
             let hasGamepad = false;
             this.gamepads.forEach((oldGamepad, oldIndex) => {
-                if (oldGamepad.index !== gamepad.index) return;
-                const gamepadToSave = {
+                if (!oldGamepad || oldGamepad.index !== gamepad.index) return;
+                const gamepadToSave: GamepadState = {
                     axes: [],
                     buttons: {},
                     index: oldGamepad.index,
@@ -61,27 +80,27 @@ class GamepadHandler {
                 }
                 hasGamepad = true;
 
-                oldGamepad.axes.forEach((axis, axisIndex) => {
+                oldGamepad.axes.forEach((axis: number, axisIndex: number) => {
                     const val = (axis < 0.01 && axis > -0.01) ? 0 : axis;
                     const newVal = (gamepad.axes[axisIndex] < 0.01 && gamepad.axes[axisIndex] > -0.01) ? 0 : gamepad.axes[axisIndex];
                     if (newVal !== val) {
-                        let axis = ['LEFT_STICK_X', 'LEFT_STICK_Y', 'RIGHT_STICK_X', 'RIGHT_STICK_Y'][axisIndex];
-                        if (!axis) {
-                            axis = "EXTRA_STICK_" + axisIndex;
+                        let axisName: string = ['LEFT_STICK_X', 'LEFT_STICK_Y', 'RIGHT_STICK_X', 'RIGHT_STICK_Y'][axisIndex];
+                        if (!axisName) {
+                            axisName = "EXTRA_STICK_" + axisIndex;
                         }
                         this.dispatchEvent('axischanged', {
-                            axis: axis,
+                            axis: axisName,
                             value: newVal,
                             oldValue: val,
                             index: gamepad.index,
-                            label: this.getAxisLabel(axis, newVal),
+                            label: this.getAxisLabel(axisName, newVal),
                             gamepadIndex: gamepad.index,
                         });
                     }
                     gamepadToSave.axes[axisIndex] = newVal;
                 })
 
-                gamepad.buttons.forEach((button, buttonIndex) => {
+                gamepad.buttons.forEach((button: any, buttonIndex: number) => {
                     let pressed = oldGamepad.buttons[buttonIndex] === 1.0;
                     if (typeof oldGamepad.buttons[buttonIndex] === "object") {
                         pressed = oldGamepad.buttons[buttonIndex].pressed;
@@ -119,29 +138,29 @@ class GamepadHandler {
             let has = false;
             for (let i=0; i<gamepads.length; i++) {
                 if (!gamepads[i]) continue;
-                if (this.gamepads[j].index === gamepads[i].index) {
+                if (this.gamepads[j]!.index === gamepads[i].index) {
                     has = true;
                     break;
                 }
             }
             if (!has) {
-                this.dispatchEvent('disconnected', {gamepadIndex: this.gamepads[j].index});
+                this.dispatchEvent('disconnected', {gamepadIndex: this.gamepads[j]!.index});
                 this.gamepads.splice(j, 1);
                 j--;
             }
         }
     }
-    dispatchEvent(name, arg) {
+    dispatchEvent(name: string, arg: any) {
         if (typeof this.listeners[name] !== 'function') return;
         if (!arg) arg={};
         arg.type = name;
         this.listeners[name](arg);
     }
-    on(name, cb) {
+    on(name: string, cb: (arg: any) => void) {
         this.listeners[name.toLowerCase()] = cb;
     }
 
-    getButtonLabel(index) {
+    getButtonLabel(index: number | null | undefined): string | null {
         if (index === null || index === undefined) {
             return null;
         }
@@ -150,8 +169,8 @@ class GamepadHandler {
         }
         return this.buttonLabels[index];
     }
-    getAxisLabel(axis, value) {
-        let valueLabel = null;
+    getAxisLabel(axis: string, value: number): string | null {
+        let valueLabel: string | null = null;
         if (value > 0.5 || value < -0.5) {
             if (value > 0) {
                 valueLabel = '+1';
