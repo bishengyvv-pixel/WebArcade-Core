@@ -365,6 +365,7 @@ export function createBottomMenuBar(emu) {
 
         emu.elements.menu.appendChild(volumeSettings);
 
+        console.log("[bottomBar] buttonOpts:", emu.config.buttonOpts, "contextMenu:", emu.config.buttonOpts && emu.config.buttonOpts.contextMenu);
         const contextMenuButton = addButton(emu.config.buttonOpts.contextMenu, () => {
             if (emu.elements.contextmenu.style.display === "none") {
                 emu.elements.contextmenu.style.display = "block";

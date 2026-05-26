@@ -214,5 +214,6 @@ export function buildButtonOptions(emu, buttonUserOpts) {
         }
     }
 
+    console.log("[buildButtonOptions] result has contextMenu:", !!mergedButtonOptions.contextMenu, "diskButton:", !!mergedButtonOptions.diskButton);
     return mergedButtonOptions;
 }
