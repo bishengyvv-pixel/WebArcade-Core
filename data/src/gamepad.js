@@ -1,3 +1,7 @@
+// [gamepad.js] 物理手柄管理 — Gamepad API 封装
+// 职责：检测手柄连接/断开、轮询手柄状态、提供按钮标签映射
+// 不负责：游戏内的手柄输入处理（由 input/gamepad.js 处理）、虚拟手柄 DOM（由 ui/gamepad.js 处理）
+
 class GamepadHandler {
     constructor() {
         this.buttonLabels = {

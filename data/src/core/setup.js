@@ -1,4 +1,8 @@
-import { EJS_SHADERS } from "./shaders.js";
+// [core/setup.js] 初始化设置
+// 职责：启动时的初始化配置、已弃用配置项检查与迁移提示
+// 不负责：运行时配置读写（由 core/config.js 处理）
+
+import { EJS_SHADERS } from "../engine/shaders.js";
 
 class EJS_SETUP {
     constructor(EJS) {

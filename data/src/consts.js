@@ -1,3 +1,7 @@
+// [consts.js] 常量定义 — EmulatorJS 全局常量
+// 职责：版本号、核心列表、文件扩展名映射、特殊选项名称等编译时确定的常量
+// 不负责：运行时动态配置（由 core/config.js 处理）、浏览器/环境检测
+
 export const version = "4.3.0-pre";
 
 export const cores = {

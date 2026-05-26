@@ -1,3 +1,7 @@
+// [license.js] 许可证文本 — GPL v3 协议全文
+// 职责：导出 EJS_license 字符串常量供 about 页面展示
+// 不负责：许可证的执行或合规性检查
+
 export const EJS_license = `
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007

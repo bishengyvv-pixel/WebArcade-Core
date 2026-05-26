@@ -1,3 +1,7 @@
+// [utils.js] 通用工具函数
+// 职责：cyrb53 哈希、guid 生成、简单的浏览器/环境检测辅助
+// 不负责：模拟引擎特定逻辑、UI 构建
+
 /**
  * EJS Utility Functions
  */

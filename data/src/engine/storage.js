@@ -1,3 +1,7 @@
+// [storage.js] 持久化存储 — IndexedDB 封装
+// 职责：EJS_STORAGE 打开/管理 IndexedDB 数据库，提供 get/put/remove/getAll 接口
+// 不负责：缓存策略与文件组织（由 cache.js 处理）
+
 /**
  * Thin wrapper around a single IndexedDB object store.
  * Handles opening the database and provides get/put/remove/getAll helpers.

@@ -1,3 +1,7 @@
+// [GameManager.js] 引擎桥接层 — WASM/RetroArch 接口封装
+// 职责：封装 Emscripten Module 的 FS、callMain、screenshot 等接口，管理模拟核心的输入输出
+// 不负责：UI 层的状态管理（由 emulator.js 协调）、文件缓存（由 cache.js 处理）
+
 class EJS_GameManager {
     constructor(Module, EJS) {
         this.EJS = EJS;

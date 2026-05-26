@@ -1,4 +1,8 @@
-import { guid } from "./utils.js";
+// [netplay.js] 联机对战 — WebRTC 多人游戏
+// 职责：房间创建、端对端连接、音视频流传输、输入同步
+// 不负责：单人游戏逻辑、模拟引擎状态管理
+
+import { guid } from "../utils.js";
 
 /**
  * Netplay - WebRTC-based multiplayer for EmulatorJS

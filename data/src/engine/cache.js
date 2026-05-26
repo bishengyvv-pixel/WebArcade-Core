@@ -1,4 +1,8 @@
-import { simpleHash } from "./utils.js";
+// [cache.js] 缓存系统 — ROM/存档文件的下载、解压、存储与检索
+// 职责：EJS_Cache（缓存管理）、EJS_CacheItem（缓存项）、EJS_FileItem（文件项）、EJS_Download（下载器）
+// 不负责：压缩/解压算法实现（由 compression.js 处理）、存储底层 API（由 storage.js 处理）
+
+import { simpleHash } from "../utils.js";
 import { EJS_STORAGE } from "./storage.js";
 import { EJS_COMPRESSION } from "./compression.js";
 

@@ -1,3 +1,7 @@
+// [compression.js] 压缩/解压 — 多格式归档文件处理
+// 职责：检测压缩格式（ZIP/7Z/RAR）、使用 Web Worker 异步解压
+// 不负责：文件下载与缓存管理（由 cache.js 处理）
+
 /**
  * Handles compression and decompression of various archive formats (ZIP, 7Z, RAR)
  * for the EmulatorJS system.

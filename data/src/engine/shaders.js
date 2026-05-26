@@ -1,3 +1,7 @@
+// [shaders.js] 着色器定义 — RetroArch 着色器预设
+// 职责：EJS_SHADERS 导出所有内置着色器的 GLSL 代码
+// 不负责：着色器的编译与应用（由 setup.js 和引擎层处理）
+
 /**
  * Shader configuration format:
  *
