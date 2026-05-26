@@ -367,7 +367,7 @@ class EJS_Cache {
             request.onsuccess = (event) => {
                 this.storage = new EJS_STORAGE(this.databaseName, "cache", indexes);
                 this.blobStorage = new EJS_STORAGE(this.databaseName, "blobs");
-                resolve();
+                resolve(undefined);
             };
 
             request.onerror = (event) => {
@@ -423,8 +423,8 @@ class EJS_Cache {
         if (!objectStore) return;
         return await new Promise<void>(resolve => {
             const request = objectStore.put(value, key);
-            request.onsuccess = () => resolve();
-            request.onerror = () => resolve();
+            request.onsuccess = () => resolve(undefined);
+            request.onerror = () => resolve(undefined);
         });
     }
 
@@ -477,8 +477,8 @@ class EJS_Cache {
         if (!objectStore) return;
         return await new Promise<void>(resolve => {
             const request = objectStore.delete(key);
-            request.onsuccess = () => resolve();
-            request.onerror = () => resolve();
+            request.onsuccess = () => resolve(undefined);
+            request.onerror = () => resolve(undefined);
         });
     }
 

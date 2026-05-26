@@ -134,7 +134,7 @@ class EJS_GameManager {
                     })
                 }
             }
-            resolve();
+            resolve(undefined);
         });
     }
     writeFile(path, data) {
@@ -389,7 +389,7 @@ IF EXIST AUTORUN.BAT CALL AUTORUN.BAT
                         this.FS.writeFile(path, file.bytes);
                     }
                 }
-                resolve();
+                resolve(undefined);
             } catch (error) {
                 this.EJS.textElem.innerText = this.EJS.localization("Network Error");
                 this.EJS.textElem.style.color = "red";

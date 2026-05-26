@@ -1,3 +1,4 @@
+import { EJS_license } from "../engine/license.js";
 // [ui/contextMenu.js] 右键菜单\n// 职责：构建右键上下文菜单 DOM（存档/截图/暂停等功能按钮）\n// 不负责：菜单项的具体功能实现（由核心方法处理）
 
 export function createContextMenu(emu) {

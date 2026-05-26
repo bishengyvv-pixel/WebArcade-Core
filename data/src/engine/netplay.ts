@@ -3,99 +3,62 @@
 // 不负责：单人游戏逻辑、模拟引擎状态管理
 
 import { guid } from "../utils.js";
+declare const io: any;
+
+declare global {
+    interface Window {
+        EJS_netplayUrl?: string;
+        EJS_netplayICEServers?: RTCIceServer[];
+        webkitAudioContext?: typeof AudioContext;
+    }
+}
+
 
 /**
  * Netplay - WebRTC-based multiplayer for EmulatorJS
  * Handles room creation, peer connections, video/audio streaming, and input sync
  */
 export class Netplay {
+
     _audioBoostFactor: any;
     _audioUnlockArmed: any;
     _audioUnlockCleanup: any;
     _captureCtx: any;
-    _captureHostAudio: any;
     _captureLoopRunning: any;
     _chatBound: any;
-    _chatInput: any;
-    _chatLog: any;
-    _chatSend: any;
-    _chatTo: any;
-    _chatWrap: any;
-    _copyFrameToCapture: any;
     _dcTimer: any;
-    _dlog: any;
-    _ensureRemoteAudioContext: any;
     _gotVideoEver: any;
     _hostAudioBoostGain: any;
     _hostAudioDest: any;
     _hostAudioSourceNode: any;
     _hostCanvasOrigSize: any;
-    _initModulePostMainLoop: any;
-    _joinedDiv: any;
-    _lastVideoTime: any;
     _leaving: any;
-    _log: any;
-    _menuElement: any;
-    _origPostMainLoop: any;
-    _password: any;
-    _preferH264: any;
-    _prevPostMainLoop: any;
     _remoteAudioCtx: any;
     _remoteAudioGain: any;
     _remoteAudioSource: any;
     _restoreParentPosition: any;
-    _roomsDiv: any;
-    _routeRemoteAudio: any;
-    _tbody: any;
-    _tbody2: any;
-    _title2: any;
-    _unlockMobileAudio: any;
-    _updateListStart: any;
-    _updateListStop: any;
-    _warningShown: any;
-    adjustVideoBitrate: any;
-    armGuestAudioUnlock: any;
-    bindChatUI: any;
     captureCanvas: any;
     captureRunning: any;
-    chatAppend: any;
     chatInput: any;
     chatLog: any;
-    chatRefreshRecipients: any;
     chatSendBtn: any;
-    chatSendMessage: any;
     chatTo: any;
     chatWrap: any;
     connected: any;
     connectionTimeout: any;
     createButton: any;
-    createPeerConnection: any;
     currentFrame: any;
-    dataMessage: any;
-    defineNetplayFunctions: any;
-    drawVideoToCanvas: any;
     emu: any;
-    ensureRemoteAudioElement: any;
     extra: any;
-    freezeGuest: any;
     frozen: any;
-    getNativeResolution: any;
-    getOpenRooms: any;
-    getUserIndex: any;
     iceServers: any;
-    initWebRTCStream: any;
     init_frame: any;
     inputs: any;
     inputsData: any;
-    joinRoom: any;
-    leaveRoom: any;
     localStream: any;
     maxPlayers: any;
-    monitorVideoFrames: any;
     name: any;
     oldCheatDisplay: any;
-    openMenu: any;
-    openRoom: any;
     originalSimulateInput: any;
     owner: any;
     passwordElem: any;
@@ -107,28 +70,36 @@ export class Netplay {
     remoteAudioContext: any;
     remoteAudioElements: any;
     remoteGainNode: any;
-    requestRenegotiate: any;
     room: any;
-    roomJoined: any;
     roomNameElem: any;
-    sendMessage: any;
-    showJoinErrorDialog: any;
-    showJoinPasswordDialog: any;
-    showOpenRoomDialog: any;
     socket: any;
-    startSocketIO: any;
     stopDrawLoop: any;
     table: any;
     tabs: any;
-    unfreezeGuest: any;
-    updateList: any;
     updateListInterval: any;
-    updateNetplayUI: any;
-    updatePlayersTable: any;
-    updateTableList: any;
     url: any;
     video: any;
     webRtcReady: any;
+
+    _chatInput: any;
+    _chatLog: any;
+    _chatSend: any;
+    _chatTo: any;
+    _chatWrap: any;
+    _copyFrameToCapture: any;
+    _joinedDiv: any;
+    _lastVideoTime: any;
+    _menuElement: any;
+    _origPostMainLoop: any;
+    _password: any;
+    _prevPostMainLoop: any;
+    _roomsDiv: any;
+    _tbody: any;
+    _tbody2: any;
+    _title2: any;
+    _warningShown: any;
+    openMenu: any;
+    updateList: any;
     constructor(emu) {
         if (!emu) throw new Error("Netplay requires an EmulatorJS instance");
         this.emu = emu;
@@ -776,9 +747,10 @@ export class Netplay {
             try {
                 const els = document.querySelectorAll("audio[id^=\"ejs-remote-audio-\"]");
                 els.forEach((a) => {
-                    a.muted = false;
-                    a.volume = 1.0;
-                    a.play().catch(() => {});
+                    const audio = a as HTMLAudioElement;
+                    audio.muted = false;
+                    audio.volume = 1.0;
+                    audio.play().catch(() => {});
                 });
             } catch (e) {}
             cleanup();
@@ -892,7 +864,7 @@ export class Netplay {
 
     /** Initialize WebRTC stream from emulator canvas (host only) */
     initWebRTCStream() {
-        if (this.localStream) return Promise.resolve();
+        if (this.localStream) return Promise.resolve(undefined);
 
         if (this.emu.Module && this.emu.Module.AL && this.emu.Module.AL.currentCtx && this.emu.Module.AL.currentCtx.audioCtx) {
             this.emu.Module.AL.currentCtx.audioCtx.resume().catch(() => {});
@@ -901,17 +873,17 @@ export class Netplay {
         return new Promise<any>((resolve) => {
             try {
                 const emuCanvas = this.emu.canvas;
-                if (!emuCanvas || !emuCanvas.captureStream) { resolve(); return; }
+                if (!emuCanvas || !emuCanvas.captureStream) { resolve(undefined); return; }
 
                 // Capture directly from emulator canvas at 30fps
                 let rawStream;
                 try {
                     rawStream = emuCanvas.captureStream(30);
                 } catch (e) {
-                    resolve(); return;
+                    resolve(undefined); return;
                 }
 
-                if (!rawStream || rawStream.getVideoTracks().length === 0) { resolve(); return; }
+                if (!rawStream || rawStream.getVideoTracks().length === 0) { resolve(undefined); return; }
 
                 // "motion" for gameplay (prioritizes framerate/smoothness).
                 try { rawStream.getVideoTracks()[0].contentHint = "motion"; } catch (e) {}
@@ -959,10 +931,10 @@ export class Netplay {
                 this._dlog("[NETPLAY HOST] Stream ready - video tracks:", finalStream.getVideoTracks().length, "audio tracks:", finalStream.getAudioTracks().length);
 
                 this.captureRunning = true;
-                resolve();
+                resolve(undefined);
             } catch (e) {
                 console.error("[NETPLAY HOST] initWebRTCStream error:", e);
-                resolve();
+                resolve(undefined);
             }
         });
     }
@@ -1232,7 +1204,7 @@ export class Netplay {
             // ordered:true + maxRetransmits:0 would drop reliability;
             // inputs reliable but prioritized. "high" priority tells the
             // browser to favor this SCTP stream over video under congestion.
-            dc = pc.createDataChannel("inputs", { ordered: true, priority: "high" });
+            dc = pc.createDataChannel("inputs", { ordered: true, priority: "high" } as any);
             dc.onmessage = (e) => {
                 const d = JSON.parse(e.data);
                 if (d.type === "host-left") {
@@ -1387,7 +1359,7 @@ export class Netplay {
                 // the lowest playout delay it can manage. Graceful fallback if
                 // the property isn't supported.
                 try {
-                    if (e.receiver) e.receiver.playoutDelayHint = 0;
+                    if (e.receiver) (e.receiver as any).playoutDelayHint = 0;
                 } catch (err) {}
 
                 if (!this.video) {
@@ -1728,7 +1700,7 @@ export class Netplay {
 
     /** Update room list table */
     updateTableList() {
-        if (!this.table) return Promise.resolve();
+        if (!this.table) return Promise.resolve(undefined);
         return this.getOpenRooms().then((rooms) => {
             this.table.innerHTML = "";
             for (const k in rooms) {

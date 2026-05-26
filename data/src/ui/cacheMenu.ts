@@ -68,7 +68,7 @@ export function openCacheMenu(emu) {
             const getSize = function (size) {
                 let i = -1;
                 do {
-                    size /= 1024, i++;
+                    size = (size as number) / 1024, i++;
                 } while (size > 1024);
                 return Math.max(size, 0.1).toFixed(1) + [" kB", " MB", " GB", " TB", "PB", "EB", "ZB", "YB"][i];
             }

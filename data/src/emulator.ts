@@ -36,6 +36,78 @@ import "./vendor/nipplejs.js";
 import "./vendor/socket.io.min.js";
 
 class EmulatorJS {
+    Module: any;
+    allSettings: any;
+    analogAxes: any;
+    autofireIntervals: any;
+    canvas: any;
+    capture: any;
+    cheatMenu: any;
+    cheats: any;
+    compression: any;
+    config: any;
+    controlMenu: any;
+    controlPopup: any;
+    controls: any;
+    coreName: any;
+    createBottomMenuBarListeners: any;
+    currentPopup: any;
+    debug: any;
+    defaultAutoFireInterval: any;
+    defaultCoreOpts: any;
+    downloadType: any;
+    downloader: any;
+    ejs_version: any;
+    elements: any;
+    enableMouseLock: any;
+    extensions: any;
+    failedToStart: any;
+    fileName: any;
+    fullscreen: any;
+    functions: any;
+    game: any;
+    gameManager: any;
+    gamepad: any;
+    gamepadLabels: any;
+    gamepadSelection: any;
+    handleSettingsResize: any;
+    hasTouchScreen: any;
+    initializeGameManager: any;
+    isFastForward: any;
+    isMobile: any;
+    isSafari: any;
+    isSlowMotion: any;
+    license: any;
+    lightgunActive: any;
+    missingLang: any;
+    muted: any;
+    netplay: any;
+    netplayEnabled: any;
+    paused: any;
+    processCore: any;
+    repository: any;
+    requiresWebGL2: any;
+    resetTimeout: any;
+    retroarchOpts: any;
+    rewindEnabled: any;
+    saveFileExt: any;
+    saveSaveInterval: any;
+    settingsLoaded: any;
+    settingsMenu: any;
+    setup: any;
+    started: any;
+    storage: any;
+    storageCache: any;
+    supportsWebgl2: any;
+    textElem: any;
+    toggleFullscreen: any;
+    toggleVirtualGamepad: any;
+    toggleVirtualGamepadLeftHanded: any;
+    touch: any;
+    videoRotation: any;
+    videoRotationChanged: any;
+    volume: any;
+    webgl2Enabled: any;
     getCores() {
         let rv = CONSTS.cores;
         if (this.isSafari && this.isMobile) {
@@ -94,7 +166,7 @@ class EmulatorJS {
      */
     downloadFile(path, type, progress, notWithPath, opts, forceExtract = false, dontCache = false, dontExtract = false) {
         if (this.debug) console.log("[EJS " + type + "] Downloading " + path);
-        return new Promise(async (resolve) => {
+        return new Promise<any>(async (resolve) => {
             // Handle direct data objects (ArrayBuffer, Uint8Array, Blob)
             const data = this.toData(path);
             if (data) {
@@ -197,7 +269,7 @@ class EmulatorJS {
     toData(data, rv) {
         if (!(data instanceof ArrayBuffer) && !(data instanceof Uint8Array) && !(data instanceof Blob)) return null;
         if (rv) return true;
-        return new Promise(async (resolve) => {
+        return new Promise<any>(async (resolve) => {
             if (data instanceof ArrayBuffer) {
                 resolve(new Uint8Array(data));
             } else if (data instanceof Uint8Array) {
@@ -205,7 +277,7 @@ class EmulatorJS {
             } else if (data instanceof Blob) {
                 resolve(new Uint8Array(await data.arrayBuffer()));
             }
-            resolve();
+            resolve(undefined);
         })
     }
     checkForUpdates() {
@@ -756,9 +828,9 @@ class EmulatorJS {
         return displayMessage(this, message, time);
     }
     downloadStartState() {
-        return new Promise((resolve, reject) => {
+        return new Promise<any>((resolve, reject) => {
             if (typeof this.config.loadState !== "string" && !this.toData(this.config.loadState, true)) {
-                resolve();
+                resolve(undefined);
                 return;
             }
             this.textElem.innerText = this.localization("Download Game State");
@@ -775,7 +847,7 @@ class EmulatorJS {
                         this.gameManager.loadState(new Uint8Array(res.data.files[0].bytes));
                     }, 10);
                 })
-                resolve();
+                resolve(undefined);
             });
         })
     }
@@ -789,7 +861,7 @@ class EmulatorJS {
     download(url, type) {
         if (url === undefined || url === null || url === "") {
             if (this.debug) console.log("[EJS " + type.name.toUpperCase() + "] No URL provided, skipping download.");
-            return new Promise((resolve) => {
+            return new Promise<any>((resolve) => {
                 resolve(url);
             });
         }
@@ -806,7 +878,7 @@ class EmulatorJS {
             console.log(`[EJS ${type.name.toUpperCase()}] Core ${this.getCore()} does not require special handling, will attempt to extract if compressed.`);
         }
 
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
             let returnData;
 
             // check if url is a file object, and if so convert it to an EJS_CacheItem
@@ -1192,7 +1264,7 @@ class EmulatorJS {
     }
     checkStarted() {
         (async () => {
-            let sleep = (ms) => new Promise(r => setTimeout(r, ms));
+            let sleep = (ms) => new Promise<any>(r => setTimeout(r, ms));
             let state = "suspended";
             let popup;
             while (state === "suspended") {
@@ -1373,7 +1445,7 @@ class EmulatorJS {
         return showInputPrompt(this, opts);
     }
     selectFile() {
-        return new Promise((resolve, reject) => {
+        return new Promise<any>((resolve, reject) => {
             const file = this.createElement("input");
             file.type = "file";
             this.addEventListener(file, "change", (e) => {

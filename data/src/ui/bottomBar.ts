@@ -99,7 +99,7 @@ export function createBottomMenuBar(emu) {
 
         let paddingSet = false;
         //Now add buttons
-        const addButton = (buttonConfig, callback, element, both) => {
+        const addButton = (buttonConfig: any, callback: any, element?: any, both?: any) => {
             const button = emu.createElement("button");
             button.type = "button";
             const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -289,8 +289,8 @@ export function createBottomMenuBar(emu) {
         // get all elements from emu.config.buttonOpts with custom: true
         if (emu.config.buttonOpts) {
             for (const [key, value] of Object.entries(emu.config.buttonOpts)) {
-                if (value.custom === true) {
-                    const customBtn = addButton(value);
+                if ((value as any).custom === true) {
+                    const customBtn = addButton(value, (value as any).callback || (() => {}));
                 }
             }
         }
@@ -368,8 +368,8 @@ export function createBottomMenuBar(emu) {
         const contextMenuButton = addButton(emu.config.buttonOpts.contextMenu, () => {
             if (emu.elements.contextmenu.style.display === "none") {
                 emu.elements.contextmenu.style.display = "block";
-                emu.elements.contextmenu.style.left = (getComputedStyle(emu.elements.parent).width.split("px")[0] / 2 - getComputedStyle(emu.elements.contextmenu).width.split("px")[0] / 2) + "px";
-                emu.elements.contextmenu.style.top = (getComputedStyle(emu.elements.parent).height.split("px")[0] / 2 - getComputedStyle(emu.elements.contextmenu).height.split("px")[0] / 2) + "px";
+                emu.elements.contextmenu.style.left = (Number(getComputedStyle(emu.elements.parent).width.split("px")[0]) / 2 - Number(getComputedStyle(emu.elements.contextmenu).width.split("px")[0]) / 2) + "px";
+                emu.elements.contextmenu.style.top = (Number(getComputedStyle(emu.elements.parent).height.split("px")[0]) / 2 - Number(getComputedStyle(emu.elements.contextmenu).height.split("px")[0]) / 2) + "px";
                 setTimeout(emu.menu.close.bind(this), 20);
             } else {
                 emu.elements.contextmenu.style.display = "none";
@@ -465,11 +465,11 @@ export function createBottomMenuBar(emu) {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
                 } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
+                    (document as any).webkitExitFullscreen();
                 } else if (document.mozCancelFullScreen) {
-                    document.mozCancelFullScreen();
+                    (document as any).mozCancelFullScreen();
                 } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
+                    (document as any).msExitFullscreen();
                 }
                 exit.style.display = "none";
                 enter.style.display = "";

@@ -50,9 +50,9 @@ class EJS_STORAGE {
      */
     getObjectStore(mode = "readwrite") {
         return new Promise<any>((resolve, reject) => {
-            if (!window.indexedDB) return resolve();
+            if (!window.indexedDB) return resolve(undefined);
             let openRequest = indexedDB.open(this.dbName, 1);
-            openRequest.onerror = () => resolve();
+            openRequest.onerror = () => resolve(undefined);
             openRequest.onsuccess = () => {
                 let db = openRequest.result;
                 let transaction = db.transaction(this.storeName, mode);
@@ -87,22 +87,22 @@ class EJS_STORAGE {
     get(key, indexName = null) {
         return new Promise<any>(async (resolve, reject) => {
             const objectStore = await this.getObjectStore();
-            if (!objectStore) return resolve();
+            if (!objectStore) return resolve(undefined);
             if (!indexName) {
                 // Default: get by primary key
                 let request = objectStore.get(key);
                 request.onsuccess = () => resolve(request.result);
-                request.onerror = () => resolve();
+                request.onerror = () => resolve(undefined);
             } else {
                 // Get by index
                 try {
                     const index = objectStore.index(indexName);
                     let req = index.get(key);
                     req.onsuccess = () => resolve(req.result);
-                    req.onerror = () => resolve();
+                    req.onerror = () => resolve(undefined);
                 } catch (e) {
                     // Index not found
-                    resolve();
+                    resolve(undefined);
                 }
             }
         });
@@ -116,12 +116,12 @@ class EJS_STORAGE {
     put(key, data) {
         return new Promise<any>(async (resolve, reject) => {
             const objectStore = await this.getObjectStore();
-            if (!objectStore) return resolve();
+            if (!objectStore) return resolve(undefined);
             let request = objectStore.put(data, key);
-            request.onerror = () => resolve();
+            request.onerror = () => resolve(undefined);
             request.onsuccess = () => {
                 this.addFileToDB(key, true);
-                resolve();
+                resolve(undefined);
             };
         });
     }
@@ -133,10 +133,10 @@ class EJS_STORAGE {
     remove(key) {
         return new Promise<any>(async (resolve, reject) => {
             const objectStore = await this.getObjectStore();
-            if (!objectStore) return resolve();
+            if (!objectStore) return resolve(undefined);
             let request = objectStore.delete(key);
             this.addFileToDB(key, false);
-            request.onsuccess = () => resolve();
+            request.onsuccess = () => resolve(undefined);
             request.onerror = () => {};
         });
     }
@@ -198,19 +198,19 @@ class EJS_DUMMYSTORAGE {
     constructor() {}
     /** @returns {Promise<void>} */
     addFileToDB() {
-        return new Promise<void>(resolve => resolve());
+        return new Promise<void>(resolve => resolve(undefined));
     }
     /** @returns {Promise<undefined>} */
     get() {
-        return new Promise<void>(resolve => resolve());
+        return new Promise<void>(resolve => resolve(undefined));
     }
     /** @returns {Promise<void>} */
     put() {
-        return new Promise<void>(resolve => resolve());
+        return new Promise<void>(resolve => resolve(undefined));
     }
     /** @returns {Promise<void>} */
     remove() {
-        return new Promise<void>(resolve => resolve());
+        return new Promise<void>(resolve => resolve(undefined));
     }
     /** @returns {Promise<{}>} */
     getSizes() {

@@ -1,4 +1,5 @@
 // [ui/gamepad.js] 虚拟手柄渲染
+declare const nipplejs: any;
 // 职责：构建虚拟手柄 DOM 结构、计算按钮位置、绑定触摸/指针事件
 // 不负责：物理手柄事件处理（由 input/gamepad.js 处理）、连发逻辑（由 input/autofire.js 处理）
 
