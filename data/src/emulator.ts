@@ -325,6 +325,11 @@ class EmulatorJS {
         }
         return parseInt(rv.join(""));
     }
+    /**
+     * 创建 EmulatorJS 实例。
+     * @param {string} element - 挂载目标元素的 CSS 选择器（如 "#game"）
+     * @param {object} config - 用户配置，支持 system、gameUrl、volume、threads 等选项（详见 types/index.ts EmulatorConfig）
+     */
     constructor(element, config) {
         this.ejs_version = CONSTS.version;
         this.extensions = [];
@@ -556,12 +561,15 @@ class EmulatorJS {
     adBlocked(url, del) {
         return adBlocked(this, url, del);
     }
+    /** 订阅事件。@param {string} event - 事件名（如 "start"、"exit"） @param {Function} func - 回调 */
     on(event, func) {
         return onEvent(this, event, func);
     }
+    /** 发布事件。@param {string} event @param {*} data */
     callEvent(event, data) {
         return callEventFn(this, event, data);
     }
+    /** 取消订阅。@param {string} event @param {Function} func */
     off(event, func) {
         return offEvent(this, event, func);
     }
@@ -648,6 +656,7 @@ class EmulatorJS {
             throw new Error("Core requires minimum EmulatorJS version of " + version.minimumEJSVersion);
         }
     }
+    /** 显示启动失败错误并停止加载流程。@param {string} message - 错误信息 */
     startGameError(message) {
         console.log(message);
         this.textElem.innerText = message;
@@ -660,6 +669,7 @@ class EmulatorJS {
         this.handleResize();
         this.failedToStart = true;
     }
+    /** 下载模拟核心（ROM 文件解压后的 *.js + *.wasm），包含线程/WebGL2 检测和 CDN 回退。 */
     downloadGameCore() {
         this.textElem.innerText = this.localization("Download Game Core");
         if (!this.config.threads && this.requiresThreads(this.getCore())) {
@@ -1158,6 +1168,7 @@ class EmulatorJS {
             this.startGameFromDownload(romData);
         })();
     }
+    /** 初始化 Emscripten WASM 模块，挂载虚拟文件系统并启动模拟循环。@param {*} wasmData @param {*} threadData */
     initModule(wasmData, threadData) {
         if (typeof window.EJS_Runtime !== "function") {
             console.warn("EJS_Runtime is not defined!");
@@ -1209,6 +1220,7 @@ class EmulatorJS {
             this.startGameError(this.localization("Failed to start game"));
         });
     }
+    /** 启动游戏主流程：挂载文件系统 → 加载存档 → 设置着色器 → 写入配置文件 → 启动 WASM 主循环。 */
     startGame() {
         try {
             const args = [];
@@ -1578,6 +1590,7 @@ class EmulatorJS {
             "height": res.height
         };
     }
+    /** 将当前设置、手柄映射和金手指持久化到 localStorage。 */
     saveSettings() {
         if (!window.localStorage || this.config.disableLocalStorage || !this.settingsLoaded) return;
         if (!this.started && !this.failedToStart) return;
@@ -1643,6 +1656,7 @@ class EmulatorJS {
         }
         return "";
     }
+    /** 从 localStorage 恢复设置、手柄映射和金手指，并更新 UI。 */
     loadSettings() {
         if (!window.localStorage || this.config.disableLocalStorage) return;
         this.settingsLoaded = true;
@@ -1687,6 +1701,7 @@ class EmulatorJS {
             }
         }
     }
+    /** 处理特殊设置选项的分发（快进/慢动作/倒带/视频旋转/鼠标锁定/光枪等）。@param {string} option @param {string} value */
     handleSpecialOptions(option, value) {
         if (option === "shader") {
             this.enableShader(value);

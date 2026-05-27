@@ -1,6 +1,6 @@
 export default [
     {
-        files: ["**/*.js"],
+        files: ["**/*.js", "**/*.ts"],
         languageOptions: {
             ecmaVersion: 2020,
             sourceType: "module",
@@ -11,13 +11,71 @@ export default [
                 navigator: "readonly",
                 fetch: "readonly",
                 localStorage: "readonly",
-                sessionStorage: "readonly"
+                sessionStorage: "readonly",
+                setTimeout: "readonly",
+                clearTimeout: "readonly",
+                setInterval: "readonly",
+                clearInterval: "readonly",
+                requestAnimationFrame: "readonly",
+                URL: "readonly",
+                Blob: "readonly",
+                File: "readonly",
+                FileReader: "readonly",
+                Image: "readonly",
+                Audio: "readonly",
+                AudioContext: "readonly",
+                MediaStream: "readonly",
+                RTCPeerConnection: "readonly",
+                RTCSessionDescription: "readonly",
+                RTCIceCandidate: "readonly",
+                IDBOpenDBRequest: "readonly",
+                IDBObjectStore: "readonly",
+                IDBTransaction: "readonly",
+                IDBIndex: "readonly",
+                IDBCursor: "readonly",
+                indexedDB: "readonly",
+                WebSocket: "readonly",
+                Gamepad: "readonly",
+                PointerEvent: "readonly",
+                TouchEvent: "readonly",
+                matchMedia: "readonly",
+                getComputedStyle: "readonly",
+                HTMLInputElement: "readonly",
+                HTMLDivElement: "readonly",
+                HTMLCanvasElement: "readonly",
+                HTMLVideoElement: "readonly",
+                HTMLAudioElement: "readonly",
+                HTMLElement: "readonly",
+                Element: "readonly",
+                Node: "readonly",
+                NodeList: "readonly",
+                Event: "readonly",
+                MouseEvent: "readonly",
+                KeyboardEvent: "readonly",
+                FocusEvent: "readonly",
+                InputEvent: "readonly",
+                CustomEvent: "readonly",
+                TextEncoder: "readonly",
+                TextDecoder: "readonly",
+                Uint8Array: "readonly",
+                ArrayBuffer: "readonly",
+                DataView: "readonly",
+                Promise: "readonly",
+                Map: "readonly",
+                Set: "readonly",
+                WeakMap: "readonly"
             }
         },
         rules: {
             "no-var": "warn",
             "prefer-const": "warn",
-            "prefer-arrow-callback": "warn"
+            "prefer-arrow-callback": "warn",
+            "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+            "no-undef": "warn"
         }
+    },
+    {
+        // Don't lint vendor files
+        ignores: ["data/src/vendor/**", "data/emulator.min.js", "data/emulator.min.css"]
     }
 ];
