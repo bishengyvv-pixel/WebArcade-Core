@@ -144,7 +144,6 @@ export interface EmulatorState {
   touch: boolean;
   hasTouchScreen: boolean;
   isMobile: boolean;
-  fullscreen: boolean;
   enableMouseLock: boolean;
   videoRotation: number;
   videoRotationChanged: boolean;
@@ -167,4 +166,21 @@ export interface EmulatorState {
   defaultAutoFireInterval: number;
   storageCache: unknown;
   downloader: unknown;
+}
+
+// === UI 状态（由 core/state.ts StateStore 管理） ===
+
+export interface EmulatorUIState {
+  started: boolean;
+  paused: boolean;
+  failedToStart: boolean;
+  isFastForward: boolean;
+  isSlowMotion: boolean;
+  rewindEnabled: boolean;
+  volume: number;
+  muted: boolean;
+  touch: boolean;
+  enableMouseLock: boolean;
+  lightgunActive: boolean;
+  settingsLoaded: boolean;
 }

@@ -31,6 +31,7 @@ import { getAutofireInterval, isAutofireEnabled, startAutofire, stopAutofire, st
 import { screenshot as screenshotFn, takeScreenshot as takeScreenshotFn } from "./ui/screenshot.js";
 import { on as onEvent, off as offEvent, callEvent as callEventFn } from "./core/events.js";
 import { preGetSetting as preGetSettingFn, menuOptionChanged as menuOptionChangedFn, getSettingValue as getSettingValueFn } from "./core/config.js";
+import { StateStore } from "./core/state.js";
 
 import "./vendor/nipplejs.js";
 import "./vendor/socket.io.min.js";
@@ -59,11 +60,36 @@ class EmulatorJS {
     downloader: any;
     ejs_version: any;
     elements: any;
-    enableMouseLock: any;
+    // === StateStore-backed UI state (getter/setter delegation) ===
+    _stateStore: StateStore;
+    get started() { return this._stateStore.get('started'); }
+    set started(v: boolean) { this._stateStore.set('started', v); }
+    get paused() { return this._stateStore.get('paused'); }
+    set paused(v: boolean) { this._stateStore.set('paused', v); }
+    get failedToStart() { return this._stateStore.get('failedToStart'); }
+    set failedToStart(v: boolean) { this._stateStore.set('failedToStart', v); }
+    get isFastForward() { return this._stateStore.get('isFastForward'); }
+    set isFastForward(v: boolean) { this._stateStore.set('isFastForward', v); }
+    get isSlowMotion() { return this._stateStore.get('isSlowMotion'); }
+    set isSlowMotion(v: boolean) { this._stateStore.set('isSlowMotion', v); }
+    get rewindEnabled() { return this._stateStore.get('rewindEnabled'); }
+    set rewindEnabled(v: boolean) { this._stateStore.set('rewindEnabled', v); }
+    get volume() { return this._stateStore.get('volume'); }
+    set volume(v: number) { this._stateStore.set('volume', v); }
+    get muted() { return this._stateStore.get('muted'); }
+    set muted(v: boolean) { this._stateStore.set('muted', v); }
+    get touch() { return this._stateStore.get('touch'); }
+    set touch(v: boolean) { this._stateStore.set('touch', v); }
+    get enableMouseLock() { return this._stateStore.get('enableMouseLock'); }
+    set enableMouseLock(v: boolean) { this._stateStore.set('enableMouseLock', v); }
+    get lightgunActive() { return this._stateStore.get('lightgunActive'); }
+    set lightgunActive(v: boolean) { this._stateStore.set('lightgunActive', v); }
+    get settingsLoaded() { return this._stateStore.get('settingsLoaded'); }
+    set settingsLoaded(v: boolean) { this._stateStore.set('settingsLoaded', v); }
+
+    // === non-managed properties ===
     extensions: any;
-    failedToStart: any;
     fileName: any;
-    fullscreen: any;
     functions: any;
     game: any;
     gameManager: any;
@@ -73,29 +99,21 @@ class EmulatorJS {
     handleSettingsResize: any;
     hasTouchScreen: any;
     initializeGameManager: any;
-    isFastForward: any;
     isMobile: any;
     isSafari: any;
-    isSlowMotion: any;
     license: any;
-    lightgunActive: any;
     missingLang: any;
-    muted: any;
     netplay: any;
     netplayEnabled: any;
-    paused: any;
     processCore: any;
     repository: any;
     requiresWebGL2: any;
     resetTimeout: any;
     retroarchOpts: any;
-    rewindEnabled: any;
     saveFileExt: any;
     saveSaveInterval: any;
-    settingsLoaded: any;
     settingsMenu: any;
     setup: any;
-    started: any;
     storage: any;
     storageCache: any;
     supportsWebgl2: any;
@@ -103,10 +121,8 @@ class EmulatorJS {
     toggleFullscreen: any;
     toggleVirtualGamepad: any;
     toggleVirtualGamepadLeftHanded: any;
-    touch: any;
     videoRotation: any;
     videoRotationChanged: any;
-    volume: any;
     webgl2Enabled: any;
     getCores() {
         let rv = CONSTS.cores;
@@ -330,15 +346,13 @@ class EmulatorJS {
         this.config.buttonOpts = this.buildButtonOptions(this.config.buttonOpts);
         this.config.settingsLanguage = window.EJS_settingsLanguage || false;
 
+        this._stateStore = new StateStore({
+            volume: (typeof this.config.volume === "number") ? this.config.volume : 0.5,
+            rewindEnabled: this.preGetSetting("rewindEnabled") === "enabled",
+        });
+
         this.currentPopup = null;
-        this.isFastForward = false;
-        this.isSlowMotion = false;
-        this.failedToStart = false;
-        this.rewindEnabled = this.preGetSetting("rewindEnabled") === "enabled";
-        this.touch = false;
         this.cheats = [];
-        this.started = false;
-        this.volume = (typeof this.config.volume === "number") ? this.config.volume : 0.5;
         if (this.config.defaultControllers) {
             // Merge user config with defaults instead of replacing
             for (const [player, buttons] of Object.entries(this.config.defaultControllers)) {
@@ -354,8 +368,6 @@ class EmulatorJS {
         }
         this.defaultAutoFireInterval = 100;
         this.autofireIntervals = {};
-        this.muted = false;
-        this.paused = true;
         this.missingLang = [];
         this.setElements(element);
         this.setColor(this.config.color || "");
@@ -417,8 +429,6 @@ class EmulatorJS {
             this.canvas.classList.add("ejs-canvas-no-pointer");
         }
 
-        this.fullscreen = false;
-        this.enableMouseLock = false;
         this.supportsWebgl2 = !!document.createElement("canvas").getContext("webgl2") && (this.config.forceLegacyCores !== true);
         this.webgl2Enabled = (() => {
             let setting = this.preGetSetting("webgl2Enabled");

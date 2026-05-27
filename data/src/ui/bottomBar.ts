@@ -644,4 +644,24 @@ export function createBottomMenuBar(emu) {
             settingButton[0].classList.add("shadow");
             emu.menu.open(true);
         }
-}
+
+        // === StateStore subscriptions — reactive DOM updates ===
+        if (emu._stateStore) {
+            emu._stateStore.on('paused', (paused) => {
+                if (paused) {
+                    pauseButton.style.display = 'none';
+                    playButton.style.display = '';
+                } else {
+                    pauseButton.style.display = '';
+                    playButton.style.display = 'none';
+                }
+            });
+            emu._stateStore.on('volume', (vol) => {
+                volumeSlider.value = vol;
+            });
+            emu._stateStore.on('muted', (muted) => {
+                muteButton.style.display = muted ? 'none' : '';
+                unmuteButton.style.display = muted ? '' : 'none';
+            });
+        }
+    }
