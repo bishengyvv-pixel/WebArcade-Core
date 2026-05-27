@@ -1,11 +1,13 @@
 <div align="center">
 
-<img width="300" src="docs/Logo-light.png#gh-dark-mode-only" alt="EmulatorJS Dark Mode Logo">
-<img width="300" src="docs/Logo.png#gh-light-mode-only" alt="EmulatorJS Light Mode Logo">
+<img width="300" src="docs/Logo-light.png#gh-dark-mode-only" alt="WebArcade-Core Dark Mode Logo">
+<img width="300" src="docs/Logo.png#gh-light-mode-only" alt="WebArcade-Core Light Mode Logo">
 
 <br>
 
 Self-hosted **JavaScript** emulation for various systems.
+
+> This project is based on [EmulatorJS](https://github.com/EmulatorJS/EmulatorJS) and has been refactored with TypeScript + modular architecture. See [Improvement Plan](docs/改进计划.md) (Chinese) for details.
 
 [![License: GPLv3][Badge License]][Link License]
 [![Website][Badge Website]][Link Website]
@@ -43,21 +45,98 @@ const EJS_pathToData = 'https://cdn.emulatorjs.org/<version>/data/';
 // Replace <version> with: stable, latest, nightly, etc.
 ```
 
-### Development
-To run the project locally for development:
+### Tech Stack
 
-1.  Open a terminal in the root directory.
-2.  Install dependencies:
+- **Language**: [TypeScript](https://www.typescriptlang.org/) (migrated from JavaScript)
+- **Module System**: ES Modules (ESM)
+- **Bundler**: [Rollup](https://rollupjs.org/) with `@rollup/plugin-typescript` and `@rollup/plugin-terser`
+- **CSS**: BEM methodology with `ejs-` namespace prefix, auto-concatenated and minified
+- **Lint**: ESLint with `no-unused-vars`, `prefer-const`, `prefer-arrow-callback`
+- **Type Check**: `tsc --noEmit`
+- **Output**: Single `emulator.min.js` + `emulator.min.css` (embedded via `<script>` tag)
+
+### Project Structure
+
+```
+data/src/
+├── core/               # Orchestration & lifecycle
+│   ├── emulator.ts     # Main controller (download → extract → init WASM → game loop)
+│   ├── config.ts       # Settings management
+│   ├── events.ts       # Event bus (on/off/emit)
+│   ├── state.ts        # UI state store (get/set/on/off)
+│   └── setup.ts        # Initialization and shader setup
+├── engine/             # Emulation engine — pure logic, no DOM
+│   ├── GameManager.ts  # WASM bridge (cwrap → C functions)
+│   ├── cache.ts        # Cache management (EJS_Cache, EJS_Download)
+│   ├── compression.ts  # Archive extraction (7z/zip/rar)
+│   ├── storage.ts      # IndexedDB/LocalStorage abstraction
+│   ├── netplay.ts      # Multiplayer (WebRTC + Socket.IO)
+│   ├── shaders.ts      # Shader definitions
+│   └── license.ts      # GPL license text
+├── ui/                 # UI construction — DOM operations
+│   ├── dom.ts          # DOM helpers (createElement, addEventListener)
+│   ├── menu.ts         # Menu bar and settings panel
+│   ├── popup.ts        # Popups, messages, input prompts
+│   ├── gamepad.ts      # Virtual gamepad rendering
+│   ├── ads.ts          # Ad layer
+│   ├── screenshot.ts   # Screenshot / recording
+│   ├── bottomBar.ts    # Bottom control bar
+│   ├── settings.ts     # Settings menu
+│   ├── controls.ts     # Input mapping UI
+│   ├── cheats.ts       # Cheat code interface
+│   ├── disks.ts        # Disk management
+│   ├── cacheMenu.ts    # Cache browser
+│   ├── contextMenu.ts  # Right-click menu
+│   └── netplayMenu.ts  # Multiplayer UI
+├── input/              # Input handling — keyboard + gamepad
+│   ├── keyboard.ts     # Key events and mapping
+│   ├── gamepad.ts      # Physical gamepad (Gamepad API)
+│   └── autofire.ts     # Autofire logic
+├── css/                # BEM-scoped stylesheets (concatenated at build)
+│   ├── base.css        # Variables, reset, typography, game container
+│   ├── menu.css        # Menu bar and settings panel
+│   ├── gamepad.css     # Virtual gamepad
+│   ├── popup.css       # Popups and messages
+│   └── ads.css         # Ad layer
+├── types/
+│   └── index.ts        # TypeScript type definitions
+├── vendor/             # Third-party libraries (nipplejs, socket.io)
+├── consts.ts           # Constants (core mappings, feature flags)
+├── utils.ts            # Utility functions (hashing, GUID)
+├── emulator.ts         # Main EmulatorJS class
+└── gamepad.ts          # Gamepad handler
+```
+
+### Development
+
+1.  Install dependencies:
     ```sh
     npm i
     ```
-3.  Start the server/minification:
+2.  Start the dev server:
     ```sh
     npm run start
     ```
-4.  Open `http://localhost:8080/` to view the demo.
+3.  Open `http://localhost:8080/` to view the demo.
+4.  Type-check (optional):
+    ```sh
+    npm run typecheck
+    ```
+5.  Build for production (JS minification + CSS concatenation & minification):
+    ```sh
+    npm run minify
+    ```
 
-> **Note:** Minify your script files before deploying to a production server to optimize load times and bandwidth. See [Minification Docs](minify/README.md).
+> **Note:** The build step concatenates 5 CSS modules into a single `emulator.min.css` and minifies the Rollup-bundled `emulator.min.js`. Always run `npm run minify` before deploying. See [Minification Docs](minify/README.md).
+
+### Architecture Constraints
+
+| Layer | Allowed | Forbidden |
+|---|---|---|
+| `engine/` | Pure logic, WASM interaction, data I/O | DOM manipulation, `window.document` |
+| `ui/` | DOM creation, event binding, style updates | WASM calls, emulation engine logic |
+| `input/` | Keyboard/gamepad capture, key mapping | UI style changes, direct WASM access |
+| `core/` | Lifecycle orchestration, layer coordination | Large DOM fragments |
 
 ---
 
