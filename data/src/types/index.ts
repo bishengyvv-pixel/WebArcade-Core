@@ -132,12 +132,39 @@ export interface EmulatorConfig {
 
 // === 运行时状态（EmulatorJS 实例属性） ===
 
-export interface EmulatorUIState {
-  isPlaying: boolean;
-  isPaused: boolean;
+export interface EmulatorState {
+  started: boolean;
+  paused: boolean;
+  failedToStart: boolean;
   isFastForward: boolean;
   isSlowMotion: boolean;
   rewindEnabled: boolean;
   volume: number;
+  muted: boolean;
+  touch: boolean;
+  hasTouchScreen: boolean;
+  isMobile: boolean;
+  fullscreen: boolean;
+  enableMouseLock: boolean;
+  videoRotation: number;
+  videoRotationChanged: boolean;
   currentShader: string | null;
+  gameManager: unknown;
+  Module: unknown;
+  webgl2Enabled: boolean | null;
+  supportsWebgl2: boolean;
+  fileName: string;
+  coreName: string;
+  repository: string;
+  saveFileExt: string | false;
+  license: string;
+  allSettings: Record<string, string>;
+  settings: Record<string, string>;
+  settingsLoaded: boolean;
+  cheats: CheatEntry[];
+  defaultControllers: Record<string, Record<string, unknown>>;
+  autofireIntervals: Record<string, number>;
+  defaultAutoFireInterval: number;
+  storageCache: unknown;
+  downloader: unknown;
 }
