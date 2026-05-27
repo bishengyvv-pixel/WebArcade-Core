@@ -2,6 +2,8 @@
 // 职责：检测手柄连接/断开、轮询手柄状态、提供按钮标签映射
 // 不负责：游戏内的手柄输入处理（由 input/gamepad.js 处理）、虚拟手柄 DOM（由 ui/gamepad.js 处理）
 
+import { AXIS_DEADZONE } from "./consts.js";
+
 interface GamepadState {
     axes: number[];
     buttons: Record<number, number | { pressed: boolean }>;
@@ -81,8 +83,8 @@ class GamepadHandler {
                 hasGamepad = true;
 
                 oldGamepad.axes.forEach((axis: number, axisIndex: number) => {
-                    const val = (axis < 0.01 && axis > -0.01) ? 0 : axis;
-                    const newVal = (gamepad.axes[axisIndex] < 0.01 && gamepad.axes[axisIndex] > -0.01) ? 0 : gamepad.axes[axisIndex];
+                    const val = (axis < AXIS_DEADZONE && axis > -AXIS_DEADZONE) ? 0 : axis;
+                    const newVal = (gamepad.axes[axisIndex] < AXIS_DEADZONE && gamepad.axes[axisIndex] > -AXIS_DEADZONE) ? 0 : gamepad.axes[axisIndex];
                     if (newVal !== val) {
                         let axisName: string = ['LEFT_STICK_X', 'LEFT_STICK_Y', 'RIGHT_STICK_X', 'RIGHT_STICK_Y'][axisIndex];
                         if (!axisName) {

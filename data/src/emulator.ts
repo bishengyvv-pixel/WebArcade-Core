@@ -304,13 +304,15 @@ class EmulatorJS {
         fetch("https://cdn.emulatorjs.org/stable/data/version.json").then(response => {
             if (response.ok) {
                 response.text().then(body => {
-                    let version = JSON.parse(body);
-                    if (this.versionAsInt(this.ejs_version) < this.versionAsInt(version.version)) {
-                        console.log(`Using EmulatorJS version ${this.ejs_version} but the newest version is ${version.current_version}\nopen https://github.com/EmulatorJS/EmulatorJS to update`);
-                    }
-                })
+                    try {
+                        let version = JSON.parse(body);
+                        if (this.versionAsInt(this.ejs_version) < this.versionAsInt(version.version)) {
+                            console.log(`Using EmulatorJS version ${this.ejs_version} but the newest version is ${version.current_version}\nopen https://github.com/EmulatorJS/EmulatorJS to update`);
+                        }
+                    } catch (e) { /* invalid version json, ignore */ }
+                }).catch(() => { /* response.text() failed, ignore */ })
             }
-        })
+        }).catch(() => { /* version check network error, ignore */ })
     }
     versionAsInt(ver) {
         if (ver.endsWith("-beta")) {
@@ -1037,7 +1039,13 @@ class EmulatorJS {
         await this.gameManager.mountFileSystems();
         this.callEvent("saveDatabaseLoaded", this.gameManager.FS);
         if (this.getCore() === "ppsspp") {
-            await this.gameManager.loadPpssppAssets();
+            try {
+                await this.gameManager.loadPpssppAssets();
+            } catch (e) {
+                console.error("Failed to load PPSSPP assets:", e);
+                this.startGameError(this.localization("Network Error"));
+                throw e;
+            }
         }
     }
 

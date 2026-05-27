@@ -3,6 +3,8 @@ declare const nipplejs: any;
 // 职责：构建虚拟手柄 DOM 结构、计算按钮位置、绑定触摸/指针事件
 // 不负责：物理手柄事件处理（由 input/gamepad.js 处理）、连发逻辑（由 input/autofire.js 处理）
 
+import { MAX_ANALOG_VALUE, JOYSTICK_DEGREE_TO_RATIO, JOYSTICK_MAX_RADIUS } from "../consts.js";
+
 export function setVirtualGamepad(emu) {
         emu.virtualGamepad = emu.createElement("div");
         emu.toggleVirtualGamepad = (show) => {
@@ -371,7 +373,7 @@ export function setVirtualGamepad(emu) {
                 }
                 elems[info[i].location].appendChild(button);
                 const value = info[i].input_new_cores || info[i].input_value;
-                let downValue = info[i].joystickInput === true ? 0x7fff : 1;
+                let downValue = info[i].joystickInput === true ? MAX_ANALOG_VALUE : 1;
                 emu.addEventListener(button, "touchstart touchend touchcancel", (e) => {
                     e.preventDefault();
                     const isAnalog = emu.analogAxes.includes(value);
@@ -508,10 +510,10 @@ export function setVirtualGamepad(emu) {
                 container: elem,
                 event: (up, down, left, right) => {
                     if (dpad.joystickInput) {
-                        if (up === 1) up = 0x7fff;
-                        if (down === 1) down = 0x7fff;
-                        if (left === 1) left = 0x7fff;
-                        if (right === 1) right = 0x7fff;
+                        if (up === 1) up = MAX_ANALOG_VALUE;
+                        if (down === 1) down = MAX_ANALOG_VALUE;
+                        if (left === 1) left = MAX_ANALOG_VALUE;
+                        if (right === 1) right = MAX_ANALOG_VALUE;
                     }
                     emu.gameManager.simulateInput(0, dpad.inputValues[0], up);
                     emu.gameManager.simulateInput(0, dpad.inputValues[1], down);
@@ -563,49 +565,49 @@ export function setVirtualGamepad(emu) {
                 if (zone.joystickInput === true) {
                     let x = 0, y = 0;
                     if (degree > 0 && degree <= 45) {
-                        x = distance / 50;
-                        y = -0.022222222222222223 * degree * distance / 50;
+                        x = distance / JOYSTICK_MAX_RADIUS;
+                        y = -JOYSTICK_DEGREE_TO_RATIO * degree * distance / JOYSTICK_MAX_RADIUS;
                     }
                     if (degree > 45 && degree <= 90) {
-                        x = 0.022222222222222223 * (90 - degree) * distance / 50;
-                        y = -distance / 50;
+                        x = JOYSTICK_DEGREE_TO_RATIO * (90 - degree) * distance / JOYSTICK_MAX_RADIUS;
+                        y = -distance / JOYSTICK_MAX_RADIUS;
                     }
                     if (degree > 90 && degree <= 135) {
-                        x = 0.022222222222222223 * (90 - degree) * distance / 50;
-                        y = -distance / 50;
+                        x = JOYSTICK_DEGREE_TO_RATIO * (90 - degree) * distance / JOYSTICK_MAX_RADIUS;
+                        y = -distance / JOYSTICK_MAX_RADIUS;
                     }
                     if (degree > 135 && degree <= 180) {
-                        x = -distance / 50;
-                        y = -0.022222222222222223 * (180 - degree) * distance / 50;
+                        x = -distance / JOYSTICK_MAX_RADIUS;
+                        y = -JOYSTICK_DEGREE_TO_RATIO * (180 - degree) * distance / JOYSTICK_MAX_RADIUS;
                     }
                     if (degree > 135 && degree <= 225) {
-                        x = -distance / 50;
-                        y = -0.022222222222222223 * (180 - degree) * distance / 50;
+                        x = -distance / JOYSTICK_MAX_RADIUS;
+                        y = -JOYSTICK_DEGREE_TO_RATIO * (180 - degree) * distance / JOYSTICK_MAX_RADIUS;
                     }
                     if (degree > 225 && degree <= 270) {
-                        x = -0.022222222222222223 * (270 - degree) * distance / 50;
-                        y = distance / 50;
+                        x = -JOYSTICK_DEGREE_TO_RATIO * (270 - degree) * distance / JOYSTICK_MAX_RADIUS;
+                        y = distance / JOYSTICK_MAX_RADIUS;
                     }
                     if (degree > 270 && degree <= 315) {
-                        x = -0.022222222222222223 * (270 - degree) * distance / 50;
-                        y = distance / 50;
+                        x = -JOYSTICK_DEGREE_TO_RATIO * (270 - degree) * distance / JOYSTICK_MAX_RADIUS;
+                        y = distance / JOYSTICK_MAX_RADIUS;
                     }
                     if (degree > 315 && degree <= 359.9) {
-                        x = distance / 50;
-                        y = 0.022222222222222223 * (360 - degree) * distance / 50;
+                        x = distance / JOYSTICK_MAX_RADIUS;
+                        y = JOYSTICK_DEGREE_TO_RATIO * (360 - degree) * distance / JOYSTICK_MAX_RADIUS;
                     }
                     if (x > 0) {
-                        emu.gameManager.simulateInput(0, zone.inputValues[0], 0x7fff * x);
+                        emu.gameManager.simulateInput(0, zone.inputValues[0], MAX_ANALOG_VALUE * x);
                         emu.gameManager.simulateInput(0, zone.inputValues[1], 0);
                     } else {
-                        emu.gameManager.simulateInput(0, zone.inputValues[1], 0x7fff * -x);
+                        emu.gameManager.simulateInput(0, zone.inputValues[1], MAX_ANALOG_VALUE * -x);
                         emu.gameManager.simulateInput(0, zone.inputValues[0], 0);
                     }
                     if (y > 0) {
-                        emu.gameManager.simulateInput(0, zone.inputValues[2], 0x7fff * y);
+                        emu.gameManager.simulateInput(0, zone.inputValues[2], MAX_ANALOG_VALUE * y);
                         emu.gameManager.simulateInput(0, zone.inputValues[3], 0);
                     } else {
-                        emu.gameManager.simulateInput(0, zone.inputValues[3], 0x7fff * -y);
+                        emu.gameManager.simulateInput(0, zone.inputValues[3], MAX_ANALOG_VALUE * -y);
                         emu.gameManager.simulateInput(0, zone.inputValues[2], 0);
                     }
 

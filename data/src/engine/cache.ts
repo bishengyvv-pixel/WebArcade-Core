@@ -148,7 +148,9 @@ class EJS_Download {
                     try {
                         const headResp = await fetch(url, { method: "HEAD", headers });
                         lastModified = headResp.headers.get("Last-Modified");
-                    } catch (e) { }
+                    } catch (e) {
+                        console.warn(`HEAD request failed for ${url}, using cached version:`, e);
+                    }
                     if (lastModified) {
                         const lastModTime = Date.parse(lastModified);
                         if (!isNaN(lastModTime) && lastModTime <= cached.added) {

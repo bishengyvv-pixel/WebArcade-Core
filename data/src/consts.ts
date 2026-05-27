@@ -48,3 +48,15 @@ export const cores: Record<string, string[]> = {
 export const requiresThreads: string[] = ["ppsspp", "dosbox_pure", "azahar"];
 
 export const requiresWebGL2: string[] = ["ppsspp", "azahar"];
+
+/** Max signed 16-bit integer for RetroArch analog input values */
+export const MAX_ANALOG_VALUE = 0x7fff;
+
+/** Conversion factor from joystick angle (degrees) to Cartesian coordinate ratio (1/45) */
+export const JOYSTICK_DEGREE_TO_RATIO = 1 / 45;
+
+/** nipplejs joystick maximum expected travel distance (pixels) for normalization */
+export const JOYSTICK_MAX_RADIUS = 50;
+
+/** Gamepad axis deadzone — values below this absolute threshold are treated as zero */
+export const AXIS_DEADZONE = 0.01;

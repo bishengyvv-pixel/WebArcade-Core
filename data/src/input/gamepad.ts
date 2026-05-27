@@ -2,6 +2,8 @@
 // 职责：Gamepad API 监听、手柄输入映射、gamepadEvent 处理
 // 不负责：虚拟手柄 DOM 渲染（由 ui/gamepad.js 处理）
 
+import { MAX_ANALOG_VALUE } from "../consts.js";
+
 export function gamepadEvent(emu, e) {
     if (!emu.started) return;
     const gamepadIndex = emu.gamepadSelection.indexOf(emu.gamepad.gamepads[e.gamepadIndex].id + "_" + emu.gamepad.gamepads[e.gamepadIndex].index);
@@ -46,7 +48,7 @@ export function gamepadEvent(emu, e) {
             const isAnalog = emu.analogAxes.includes(j);
 
             if (["buttonup", "buttondown"].includes(e.type) && (controlValue === e.label || controlValue === e.index)) {
-                const inputValue = isAnalog ? 0x7fff : 1;
+                const inputValue = isAnalog ? MAX_ANALOG_VALUE : 1;
                 const isButtonUp = e.type === "buttonup";
                 const value = isButtonUp ? 0 : inputValue;
 
@@ -60,34 +62,34 @@ export function gamepadEvent(emu, e) {
                     if (isAnalog) {
                         if (j === 16 || j === 17) {
                             if (e.value > 0) {
-                                emu.gameManager.simulateInput(i, 16, 0x7fff * e.value);
+                                emu.gameManager.simulateInput(i, 16, MAX_ANALOG_VALUE * e.value);
                                 emu.gameManager.simulateInput(i, 17, 0);
                             } else {
-                                emu.gameManager.simulateInput(i, 17, -0x7fff * e.value);
+                                emu.gameManager.simulateInput(i, 17, -MAX_ANALOG_VALUE * e.value);
                                 emu.gameManager.simulateInput(i, 16, 0);
                             }
                         } else if (j === 18 || j === 19) {
                             if (e.value > 0) {
-                                emu.gameManager.simulateInput(i, 18, 0x7fff * e.value);
+                                emu.gameManager.simulateInput(i, 18, MAX_ANALOG_VALUE * e.value);
                                 emu.gameManager.simulateInput(i, 19, 0);
                             } else {
-                                emu.gameManager.simulateInput(i, 19, -0x7fff * e.value);
+                                emu.gameManager.simulateInput(i, 19, -MAX_ANALOG_VALUE * e.value);
                                 emu.gameManager.simulateInput(i, 18, 0);
                             }
                         } else if (j === 20 || j === 21) {
                             if (e.value > 0) {
-                                emu.gameManager.simulateInput(i, 20, 0x7fff * e.value);
+                                emu.gameManager.simulateInput(i, 20, MAX_ANALOG_VALUE * e.value);
                                 emu.gameManager.simulateInput(i, 21, 0);
                             } else {
-                                emu.gameManager.simulateInput(i, 21, -0x7fff * e.value);
+                                emu.gameManager.simulateInput(i, 21, -MAX_ANALOG_VALUE * e.value);
                                 emu.gameManager.simulateInput(i, 20, 0);
                             }
                         } else if (j === 22 || j === 23) {
                             if (e.value > 0) {
-                                emu.gameManager.simulateInput(i, 22, 0x7fff * e.value);
+                                emu.gameManager.simulateInput(i, 22, MAX_ANALOG_VALUE * e.value);
                                 emu.gameManager.simulateInput(i, 23, 0);
                             } else {
-                                emu.gameManager.simulateInput(i, 23, -0x7fff * e.value);
+                                emu.gameManager.simulateInput(i, 23, -MAX_ANALOG_VALUE * e.value);
                                 emu.gameManager.simulateInput(i, 22, 0);
                             }
                         }

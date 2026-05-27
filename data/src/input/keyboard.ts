@@ -2,6 +2,8 @@
 // 职责：监听键盘事件、keyLookup 映射、keyChange 状态变更
 // 不负责：连发逻辑（由 input/autofire.js 处理）、UI 更新（由 ui/ 层处理）
 
+import { MAX_ANALOG_VALUE } from "../consts.js";
+
 export function keyLookup(emu, controllerkey) {
     if (controllerkey === undefined) return 0;
     if (typeof controllerkey === "number") return controllerkey;
@@ -35,7 +37,7 @@ export function keyChange(emu, e) {
         for (let j = 0; j < 30; j++) {
             if (emu.controls[i][j] && emu.controls[i][j].value === e.keyCode) {
                 const isAnalog = emu.analogAxes.includes(j);
-                const inputValue = isAnalog ? 0x7fff : 1;
+                const inputValue = isAnalog ? MAX_ANALOG_VALUE : 1;
                 const isKeyUp = e.type === "keyup";
                 const value = isKeyUp ? 0 : inputValue;
 

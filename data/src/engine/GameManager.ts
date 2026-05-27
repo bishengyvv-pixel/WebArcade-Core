@@ -391,8 +391,6 @@ IF EXIST AUTORUN.BAT CALL AUTORUN.BAT
                 }
                 resolve(undefined);
             } catch (error) {
-                this.EJS.textElem.innerText = this.EJS.localization("Network Error");
-                this.EJS.textElem.style.color = "red";
                 reject(error);
             }
         })

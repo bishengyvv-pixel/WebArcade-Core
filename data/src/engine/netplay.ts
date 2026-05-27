@@ -3,6 +3,7 @@
 // 不负责：单人游戏逻辑、模拟引擎状态管理
 
 import { guid } from "../utils.js";
+import { NetplayMenuUI } from "../ui/netplayMenu.js";
 declare const io: any;
 
 declare global {
@@ -80,29 +81,18 @@ export class Netplay {
     url: any;
     video: any;
     webRtcReady: any;
+    menuUI: NetplayMenuUI;
 
-    _chatInput: any;
-    _chatLog: any;
-    _chatSend: any;
-    _chatTo: any;
-    _chatWrap: any;
     _copyFrameToCapture: any;
-    _joinedDiv: any;
     _lastVideoTime: any;
-    _menuElement: any;
     _origPostMainLoop: any;
-    _password: any;
     _prevPostMainLoop: any;
-    _roomsDiv: any;
-    _tbody: any;
-    _tbody2: any;
-    _title2: any;
-    _warningShown: any;
     openMenu: any;
     updateList: any;
     constructor(emu) {
         if (!emu) throw new Error("Netplay requires an EmulatorJS instance");
         this.emu = emu;
+        this.menuUI = new NetplayMenuUI(this.emu, this);
 
         // Connection state
         this.owner = false;
@@ -156,7 +146,7 @@ export class Netplay {
         this._gotVideoEver = false;
         this._audioUnlockArmed = false;
         this._audioUnlockCleanup = null;
-        this._chatBound = false;
+        this.menuUI._chatBound = false;
         this._leaving = false;
         this._dcTimer = null;
         this.connectionTimeout = null;
@@ -165,18 +155,6 @@ export class Netplay {
         this.originalSimulateInput = null;
         this.oldCheatDisplay = null;
 
-        // UI element references
-        this.table = null;
-        this.playerTable = null;
-        this.passwordElem = null;
-        this.roomNameElem = null;
-        this.createButton = null;
-        this.tabs = null;
-        this.chatWrap = null;
-        this.chatLog = null;
-        this.chatTo = null;
-        this.chatInput = null;
-        this.chatSendBtn = null;
         this._hostCanvasOrigSize = null;
 
         // Server configuration
@@ -194,279 +172,23 @@ export class Netplay {
 
     /** Whether the netplay menu DOM has been built */
     isMenuCreated() {
-        return !!this._menuElement;
+        return !!this.menuUI._menuElement;
     }
 
     /** Whether the netplay menu is currently visible */
     isMenuOpen() {
-        return !!(this._menuElement && this._menuElement.style.display !== "none");
+        return this.menuUI.isMenuOpen();
     }
 
     /** Toggle visibility of UI elements based on host/guest role */
     updateNetplayUI(isJoining) {
-        if (!this.emu.elements.bottomBar) return;
-        const bar = this.emu.elements.bottomBar;
-        const shouldHide = isJoining && !this.owner;
-        const elems = [
-            ...(bar.playPause || []), ...(bar.restart || []), ...(bar.saveState || []),
-            ...(bar.loadState || []), ...(bar.cheat || []), ...(bar.saveSavFiles || []),
-            ...(bar.loadSavFiles || []), ...(bar.exit || []), ...(bar.contextMenu || []),
-            ...(bar.cacheManager || [])
-        ];
-        if (bar.settings && bar.settings.length > 0 && bar.settings[0].parentElement) elems.push(bar.settings[0].parentElement);
-        if (this.emu.diskParent) elems.push(this.emu.diskParent);
-        elems.forEach((el) => { if (el) el.classList.toggle("netplay-hidden", shouldHide); });
+        this.menuUI.updateNetplayUI(isJoining);
     }
 
-    /** Build the netplay menu popup with room list, chat, and player table */
+    /** Build the netplay menu popup — delegates to UI layer */
     createNetplayMenu() {
-        const body = this.emu.createPopup("Netplay", {
-            "Create a Room": () => {
-                this._unlockMobileAudio();
-                if (!this.updateList) this.defineNetplayFunctions();
-                if (this.emu.isNetplay) this.leaveRoom();
-                else this.showOpenRoomDialog();
-            },
-            "Close": () => {
-                this._menuElement.style.display = "none";
-                if (this.updateList) this.updateList.stop();
-            }
-        }, true);
-
-        this._menuElement = body.parentElement;
-        this.createButton = this._menuElement.getElementsByTagName("a")[0];
-
-        // Room list section
-        const rooms = this.emu.createElement("div");
-        const title = this.emu.createElement("strong");
-        title.innerText = this.emu.localization("Rooms");
-
-        const table = this.emu.createElement("table");
-        table.classList.add("ejs-netplay_table");
-        table.style.width = "100%";
-        table.setAttribute("cellspacing", "0");
-
-        const thead = this.emu.createElement("thead");
-        const row = this.emu.createElement("tr");
-        const addToHeader = (text) => {
-            const item = this.emu.createElement("td");
-            item.innerText = text;
-            item.style.textAlign = "center";
-            row.appendChild(item);
-            return item;
-        };
-        thead.appendChild(row);
-        addToHeader("Room Name").style.textAlign = "left";
-        addToHeader("Players").style.width = "80px";
-        addToHeader("").style.width = "80px";
-        table.appendChild(thead);
-
-        const tbody = this.emu.createElement("tbody");
-        table.appendChild(tbody);
-        rooms.appendChild(title);
-        rooms.appendChild(table);
-
-        // Joined room section
-        const joined = this.emu.createElement("div");
-        const title2 = this.emu.createElement("strong");
-        title2.innerText = "{roomname}";
-
-        const password = this.emu.createElement("div");
-        password.innerText = "Password: ";
-
-        const table2 = this.emu.createElement("table");
-        table2.classList.add("ejs-netplay_table");
-        table2.style.width = "100%";
-        table2.setAttribute("cellspacing", "0");
-
-        const thead2 = this.emu.createElement("thead");
-        const row2 = this.emu.createElement("tr");
-        const addToHeader2 = (text) => {
-            const item = this.emu.createElement("td");
-            item.innerText = text;
-            row2.appendChild(item);
-            return item;
-        };
-        thead2.appendChild(row2);
-        addToHeader2("Player").style.width = "80px";
-        addToHeader2("Name");
-        addToHeader2("").style.width = "80px";
-        table2.appendChild(thead2);
-
-        const tbody2 = this.emu.createElement("tbody");
-        table2.appendChild(tbody2);
-        joined.appendChild(title2);
-        joined.appendChild(password);
-        joined.appendChild(table2);
-
-        // Chat UI
-        const chatWrap = this.emu.createElement("div");
-        chatWrap.classList.add("ejs-netplay_chat_container");
-        chatWrap.style.marginTop = "10px";
-
-        const chatHeaderRow = this.emu.createElement("div");
-        chatHeaderRow.classList.add("ejs-netplay_chat_header_row");
-        chatWrap.appendChild(chatHeaderRow);
-
-        const chatTitle = this.emu.createElement("strong");
-        chatTitle.innerText = this.emu.localization("Chat");
-        chatHeaderRow.appendChild(chatTitle);
-
-        const chatHint = this.emu.createElement("span");
-        chatHint.classList.add("ejs-netplay_chat_hint");
-        chatHint.innerText = this.emu.localization("Everyone or private");
-        chatHeaderRow.appendChild(chatHint);
-
-        const chatLog = this.emu.createElement("div");
-        chatLog.classList.add("ejs-netplay_chat_log");
-        chatWrap.appendChild(chatLog);
-
-        const chatRow = this.emu.createElement("div");
-        chatRow.classList.add("ejs-netplay_chat_row");
-        chatWrap.appendChild(chatRow);
-
-        const chatTo = this.emu.createElement("select");
-        chatTo.classList.add("ejs-netplay_chat_to");
-        const optAll = document.createElement("option");
-        optAll.value = "all";
-        optAll.innerText = this.emu.localization("Everyone");
-        chatTo.appendChild(optAll);
-        chatRow.appendChild(chatTo);
-
-        const chatInput = this.emu.createElement("input");
-        chatInput.type = "text";
-        chatInput.maxLength = 300;
-        chatInput.placeholder = this.emu.localization("Type a message...");
-        chatInput.classList.add("ejs-netplay_chat_input");
-        chatRow.appendChild(chatInput);
-
-        const chatSend = this.emu.createElement("button");
-        chatSend.classList.add("ejs-button_button");
-        chatSend.style.height = "34px";
-        chatSend.style.minWidth = "70px";
-        chatSend.innerText = this.emu.localization("Send");
-        chatRow.appendChild(chatSend);
-
-        joined.appendChild(chatWrap);
-        joined.style.display = "none";
-        body.appendChild(rooms);
-        body.appendChild(joined);
-
-        // Store references
-        this._roomsDiv = rooms;
-        this._joinedDiv = joined;
-        this._tbody = tbody;
-        this._tbody2 = tbody2;
-        this._password = password;
-        this._title2 = title2;
-        this._chatWrap = chatWrap;
-        this._chatLog = chatLog;
-        this._chatTo = chatTo;
-        this._chatInput = chatInput;
-        this._chatSend = chatSend;
-
-        this.openMenu = () => {
-            // Show TURN warning if needed
-            if (this.emu.netplayShowTurnWarning && !this._warningShown) {
-                const warningDiv = this.emu.createElement("div");
-                warningDiv.className = "ejs-netplay_warning";
-                warningDiv.innerText = "Warning: No TURN server configured. Netplay connections may fail.";
-                const menuBody = this._menuElement.querySelector(".ejs_popup_body");
-                if (menuBody) {
-                    menuBody.prepend(warningDiv);
-                    this._warningShown = true;
-                }
-            }
-
-            this._menuElement.style.display = "";
-            this.table = this._tbody;
-            this.playerTable = this._tbody2;
-            this.passwordElem = this._password;
-            this.roomNameElem = this._title2;
-            this.tabs = [this._roomsDiv, this._joinedDiv];
-            this.chatWrap = this._chatWrap;
-            this.chatLog = this._chatLog;
-            this.chatTo = this._chatTo;
-            this.chatInput = this._chatInput;
-            this.chatSendBtn = this._chatSend;
-
-            // Prompt for player name if not set
-            if (!this.name) {
-                const popups = this.emu.createSubPopup();
-                this._menuElement.appendChild(popups[0]);
-                popups[1].classList.add("ejs-cheat_parent");
-                const popup = popups[1];
-
-                const header = this.emu.createElement("div");
-                const nameTitle = this.emu.createElement("h2");
-                nameTitle.innerText = this.emu.localization("Set Player Name");
-                nameTitle.classList.add("ejs-netplay_name_heading");
-                header.appendChild(nameTitle);
-                popup.appendChild(header);
-
-                const main = this.emu.createElement("div");
-                main.classList.add("ejs-netplay_header");
-                const head = this.emu.createElement("strong");
-                head.innerText = this.emu.localization("Player Name");
-                const input = this.emu.createElement("input");
-                input.type = "text";
-                input.setAttribute("maxlength", 20);
-
-                main.appendChild(head);
-                main.appendChild(this.emu.createElement("br"));
-                main.appendChild(input);
-                popup.appendChild(main);
-                popup.appendChild(this.emu.createElement("br"));
-
-                const buttonRow = this.emu.createElement("div");
-                buttonRow.style.display = "flex";
-                buttonRow.style.justifyContent = "center";
-                buttonRow.style.gap = "10px";
-                popup.appendChild(buttonRow);
-
-                const submit = this.emu.createElement("button");
-                submit.classList.add("ejs-button_button", "ejs-popup_submit");
-                submit.style.backgroundColor = "rgba(var(--ejs-primary-color),1)";
-                submit.innerText = this.emu.localization("Submit");
-                buttonRow.appendChild(submit);
-
-                const cancel = this.emu.createElement("button");
-                cancel.classList.add("ejs-button_button", "ejs-popup_submit");
-                cancel.innerText = this.emu.localization("Cancel");
-                buttonRow.appendChild(cancel);
-
-                const closeNamePopup = () => popups[0].remove();
-
-                this.emu.addEventListener(submit, "click", () => {
-                    if (!input.value.trim()) return;
-                    this.name = input.value.trim();
-                    closeNamePopup();
-                });
-
-                this.emu.addEventListener(cancel, "click", () => {
-                    closeNamePopup();
-                    this._menuElement.style.display = "none";
-                    if (this.updateList) this.updateList.stop();
-                });
-
-                this.emu.addEventListener(input, "keydown", (e) => {
-                    if (e.key === "Enter") {
-                        e.preventDefault();
-                        submit.click();
-                    } else if (e.key === "Escape") {
-                        e.preventDefault();
-                        cancel.click();
-                    }
-                });
-
-                setTimeout(() => input.focus(), 0);
-            }
-
-            if (!this.updateList) this.defineNetplayFunctions();
-            this.bindChatUI();
-            this.chatRefreshRecipients();
-            this.updateList.start();
-        };
+        this.menuUI.createNetplayMenu();
+        this.openMenu = this.menuUI.openMenu;
     }
 
     /** Initialize update list and hook into emulator's main loop */
@@ -989,18 +711,18 @@ export class Netplay {
         this.owner = isOwner;
 
         // Update UI
-        if (this.roomNameElem) this.roomNameElem.innerText = roomName;
-        if (this.tabs && this.tabs[0]) {
-            this.tabs[0].style.display = "none";
-            this.tabs[1].style.display = "";
+        if (this.menuUI.roomNameElem) this.menuUI.roomNameElem.innerText = roomName;
+        if (this.menuUI.tabs && this.menuUI.tabs[0]) {
+            this.menuUI.tabs[0].style.display = "none";
+            this.menuUI.tabs[1].style.display = "";
         }
-        if (this.passwordElem) {
-            this.passwordElem.style.display = password ? "" : "none";
-            this.passwordElem.innerText = password ? "Password: " + password : "";
+        if (this.menuUI.passwordElem) {
+            this.menuUI.passwordElem.style.display = password ? "" : "none";
+            this.menuUI.passwordElem.innerText = password ? "Password: " + password : "";
         }
-        if (this.createButton) this.createButton.innerText = this.emu.localization("Leave Room");
+        if (this.menuUI.createButton) this.menuUI.createButton.innerText = this.emu.localization("Leave Room");
 
-        this.updatePlayersTable();
+        this.menuUI.updatePlayersTable();
 
         if (!isOwner) {
             // Guest setup: freeze local emulation and show remote stream
@@ -1458,66 +1180,31 @@ export class Netplay {
         setTimeout(checkFrames, 1000);
     }
 
-    /** Append message to chat log */
+    /** Append message to chat log — delegates to UI layer */
     chatAppend(payload) {
-        if (!this.chatLog) return;
-        const name = payload && payload.player_name ? payload.player_name : "Player";
-        const msg = payload && payload.message ? payload.message : "";
-        const to = payload && payload.to ? payload.to : "all";
-        const line = document.createElement("div");
-        if (to && to !== "all") {
-            line.textContent = name + " (private): " + msg;
-            line.style.opacity = "0.95";
-        } else {
-            line.textContent = name + ": " + msg;
-        }
-        this.chatLog.appendChild(line);
-        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+        this.menuUI.chatAppend(payload);
     }
 
-    /** Refresh chat recipient dropdown with current players */
+    /** Refresh chat recipient dropdown — delegates to UI layer */
     chatRefreshRecipients() {
-        if (!this.chatTo) return;
-        const sel = this.chatTo;
-        const prev = sel.value || "all";
-        sel.innerHTML = "";
-        const optAll = document.createElement("option");
-        optAll.value = "all";
-        optAll.innerText = this.emu.localization("Everyone");
-        sel.appendChild(optAll);
-        const players = this.players || {};
-        Object.keys(players).forEach((userid) => {
-            const p = players[userid];
-            const opt = document.createElement("option");
-            opt.value = userid;
-            opt.innerText = p.player_name || "Player";
-            sel.appendChild(opt);
-        });
-        const stillExists = Array.from(sel.options).some((o) => o.value === prev);
-        sel.value = stillExists ? prev : "all";
+        this.menuUI.chatRefreshRecipients();
     }
 
     /** Send chat message to selected recipient(s) */
     chatSendMessage() {
-        if (!this.socket || !this.socket.connected || !this.chatInput || !this.chatTo) return;
-        const message = String(this.chatInput.value || "").trim();
+        if (!this.socket || !this.socket.connected || !this.menuUI.chatInput || !this.menuUI.chatTo) return;
+        const message = String(this.menuUI.chatInput.value || "").trim();
         if (!message) return;
-        const to = this.chatTo.value || "all";
-        this.chatInput.value = "";
+        const to = this.menuUI.chatTo.value || "all";
+        this.menuUI.chatInput.value = "";
         const chatPayload = { player_name: this.name || "Player", message, to, from: this.playerID };
-        this.chatAppend(chatPayload);
+        this.menuUI.chatAppend(chatPayload);
         this.sendMessage({ "chat-message": chatPayload });
     }
 
-    /** Bind event listeners to chat UI elements */
+    /** Bind event listeners to chat UI elements — delegates to UI layer */
     bindChatUI() {
-        if (this._chatBound) return;
-        if (!this._chatSend || !this._chatInput) return;
-        this._chatBound = true;
-        this.emu.addEventListener(this._chatSend, "click", () => { this.chatSendMessage(); });
-        this.emu.addEventListener(this._chatInput, "keydown", (e) => {
-            if (e.key === "Enter") { e.preventDefault(); this.chatSendMessage(); }
-        });
+        this.menuUI.bindChatUI();
     }
 
     /** Clean up and leave the current room */
@@ -1635,14 +1322,14 @@ export class Netplay {
         }
 
         // Reset UI
-        if (this.createButton) this.createButton.innerText = this.emu.localization("Create Room");
-        if (this.tabs) {
-            this.tabs[0].style.display = "";
-            this.tabs[1].style.display = "none";
+        if (this.menuUI.createButton) this.menuUI.createButton.innerText = this.emu.localization("Create Room");
+        if (this.menuUI.tabs) {
+            this.menuUI.tabs[0].style.display = "";
+            this.menuUI.tabs[1].style.display = "none";
         }
-        if (this.roomNameElem) this.roomNameElem.innerText = "";
-        if (this.passwordElem) this.passwordElem.style.display = "none";
-        if (this.playerTable) this.playerTable.innerHTML = "";
+        if (this.menuUI.roomNameElem) this.menuUI.roomNameElem.innerText = "";
+        if (this.menuUI.passwordElem) this.menuUI.passwordElem.style.display = "none";
+        if (this.menuUI.playerTable) this.menuUI.playerTable.innerHTML = "";
 
         if (this.emu.elements.bottomBar && this.emu.elements.bottomBar.cheat && this.emu.elements.bottomBar.cheat[0]) {
             this.emu.elements.bottomBar.cheat[0].style.display = this.oldCheatDisplay || "";
@@ -1698,185 +1385,27 @@ export class Netplay {
             .catch(() => ({}));
     }
 
-    /** Update room list table */
+    /** Update room list table — delegates to UI layer */
     updateTableList() {
-        if (!this.table) return Promise.resolve(undefined);
-        return this.getOpenRooms().then((rooms) => {
-            this.table.innerHTML = "";
-            for (const k in rooms) {
-                ((id, r) => {
-                    const row = this.emu.createElement("tr");
-                    row.classList.add("ejs-netplay_table_row");
-                    const c1 = this.emu.createElement("td");
-                    c1.innerText = r.room_name; c1.style.textAlign = "left"; c1.style.padding = "10px 0";
-                    const c2 = this.emu.createElement("td");
-                    c2.innerText = r.current + "/" + r.max; c2.style.width = "80px"; c2.style.textAlign = "center";
-                    const c3 = this.emu.createElement("td");
-                    c3.style.width = "80px";
-                    if (r.current < r.max) {
-                        const btn = this.emu.createElement("button");
-                        btn.classList.add("ejs-netplay_join_button", "ejs-button_button");
-                        btn.style.backgroundColor = "rgba(var(--ejs-primary-color),1)";
-                        btn.innerText = this.emu.localization("Join");
-                        c3.appendChild(btn);
-                        this.emu.addEventListener(btn, "click", () => {
-                            // Pre-create AudioContext during this user gesture
-                            this._ensureRemoteAudioContext();
-                            if (r.hasPassword) this.showJoinPasswordDialog(id, r.room_name, r.max);
-                            else this.joinRoom(id, r.room_name, r.max, null);
-                        });
-                    }
-                    row.appendChild(c1); row.appendChild(c2); row.appendChild(c3);
-                    this.table.appendChild(row);
-                })(k, rooms[k]);
-            }
-        }).catch(() => {});
+        return this.menuUI.updateTableList();
     }
 
-    _updateListStart() { this.updateListInterval = setInterval(() => { this.updateTableList(); }, 1000); }
+    _updateListStart() { this.updateListInterval = setInterval(() => { this.menuUI.updateTableList(); }, 1000); }
     _updateListStop() { clearInterval(this.updateListInterval); }
 
-    /** Show dialog to create a new room */
+    /** Show dialog to create a new room — delegates to UI layer */
     showOpenRoomDialog() {
-        if (!this.emu.createSubPopup) return;
-        this.emu.originalControls = JSON.parse(JSON.stringify(this.emu.controls));
-        const popups = this.emu.createSubPopup();
-        this._menuElement.appendChild(popups[0]);
-        popups[1].classList.add("ejs-cheat_parent");
-        const title = this.emu.createElement("h2");
-        title.innerText = this.emu.localization("Create a room");
-        title.classList.add("ejs-netplay_name_heading");
-        popups[1].appendChild(title);
-        const form = this.emu.createElement("div");
-        form.classList.add("ejs-netplay_header");
-        const ni = this.emu.createElement("input"); ni.type = "text"; ni.maxLength = 20;
-        const ms = this.emu.createElement("select");
-        ["2", "3", "4"].forEach((v) => { const o = document.createElement("option"); o.value = v; o.innerText = v; ms.appendChild(o); });
-        const pw = this.emu.createElement("input"); pw.type = "text"; pw.maxLength = 20;
-        [["Room Name", ni], ["Max Players", ms], ["Password (optional)", pw]].forEach((item) => {
-            const s = this.emu.createElement("strong");
-            s.innerText = this.emu.localization(item[0]);
-            form.appendChild(s); form.appendChild(this.emu.createElement("br")); form.appendChild(item[1]);
-        });
-        popups[1].appendChild(form);
-        const sub = this.emu.createElement("button");
-        sub.classList.add("ejs-button_button", "ejs-popup_submit");
-        sub.style.backgroundColor = "rgba(var(--ejs-primary-color),1)";
-        sub.style.margin = "10px";
-        sub.innerText = this.emu.localization("Submit");
-        this.emu.addEventListener(sub, "click", () => {
-            const n = ni.value.trim();
-            if (n) { this.openRoom(n, parseInt(ms.value, 10), pw.value.trim()); popups[0].remove(); }
-        });
-        const cls = this.emu.createElement("button");
-        cls.classList.add("ejs-button_button", "ejs-popup_submit");
-        cls.style.margin = "10px";
-        cls.innerText = this.emu.localization("Close");
-        this.emu.addEventListener(cls, "click", () => { popups[0].remove(); });
-        popups[1].appendChild(sub); popups[1].appendChild(cls);
+        this.menuUI.showOpenRoomDialog();
     }
 
-    /** Show password dialog for protected rooms */
+    /** Show password dialog for protected rooms — delegates to UI layer */
     showJoinPasswordDialog(roomId, roomName, maxPlayers) {
-        if (!this.emu.createSubPopup) return;
-        const popups = this.emu.createSubPopup();
-        this._menuElement.appendChild(popups[0]);
-        popups[1].classList.add("ejs-cheat_parent");
-        const title = this.emu.createElement("h2");
-        title.innerText = this.emu.localization("Enter Password");
-        title.classList.add("ejs-netplay_name_heading");
-        popups[1].appendChild(title);
-        const form = this.emu.createElement("div");
-        form.classList.add("ejs-netplay_header");
-        const roomLabel = this.emu.createElement("div");
-        roomLabel.classList.add("ejs-netplay_dialog_label");
-        roomLabel.innerText = this.emu.localization("Room") + ": " + roomName;
-        form.appendChild(roomLabel);
-        const pwLabel = this.emu.createElement("strong");
-        pwLabel.innerText = this.emu.localization("Password");
-        form.appendChild(pwLabel); form.appendChild(this.emu.createElement("br"));
-        const pwInput = this.emu.createElement("input");
-        pwInput.type = "password"; pwInput.maxLength = 20; pwInput.placeholder = this.emu.localization("Enter room password");
-        form.appendChild(pwInput);
-        popups[1].appendChild(form);
-        const buttonRow = this.emu.createElement("div");
-        buttonRow.classList.add("ejs-netplay_dialog_buttons");
-        const joinBtn = this.emu.createElement("button");
-        joinBtn.classList.add("ejs-button_button", "ejs-popup_submit");
-        joinBtn.style.backgroundColor = "rgba(var(--ejs-primary-color),1)";
-        joinBtn.innerText = this.emu.localization("Join");
-        const cancelBtn = this.emu.createElement("button");
-        cancelBtn.classList.add("ejs-button_button", "ejs-popup_submit");
-        cancelBtn.innerText = this.emu.localization("Cancel");
-
-        this.emu.addEventListener(joinBtn, "click", () => {
-            // Pre-create AudioContext during this user gesture
-            this._ensureRemoteAudioContext();
-            const pw = pwInput.value.trim();
-            popups[0].remove();
-            if (pw) this.joinRoom(roomId, roomName, maxPlayers, pw);
-        });
-        this.emu.addEventListener(cancelBtn, "click", () => { popups[0].remove(); });
-        this.emu.addEventListener(pwInput, "keydown", (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                // Pre-create AudioContext during this user gesture
-                this._ensureRemoteAudioContext();
-                const pw = pwInput.value.trim();
-                popups[0].remove();
-                if (pw) this.joinRoom(roomId, roomName, maxPlayers, pw);
-            }
-            if (e.key === "Escape") popups[0].remove();
-        });
-        buttonRow.appendChild(joinBtn); buttonRow.appendChild(cancelBtn); popups[1].appendChild(buttonRow);
-        setTimeout(() => pwInput.focus(), 50);
+        this.menuUI.showJoinPasswordDialog(roomId, roomName, maxPlayers);
     }
 
-    /** Show error dialog when join fails */
+    /** Show error dialog when join fails — delegates to UI layer */
     showJoinErrorDialog(roomId, roomName, maxPlayers, errorMessage, hadPassword) {
-        if (!this.emu.createSubPopup) {
-            this.emu.displayMessage(this.emu.localization("Join error") + ": " + errorMessage, 5000);
-            return;
-        }
-        const popups = this.emu.createSubPopup();
-        this._menuElement.appendChild(popups[0]);
-        popups[1].classList.add("ejs-cheat_parent");
-        const title = this.emu.createElement("h2");
-        title.innerText = this.emu.localization("Unable to Join");
-        title.classList.add("ejs-netplay_name_heading");
-        popups[1].appendChild(title);
-        const content = this.emu.createElement("div");
-        content.classList.add("ejs-netplay_header");
-        const roomLabel = this.emu.createElement("div");
-        roomLabel.classList.add("ejs-netplay_dialog_label");
-        roomLabel.innerText = this.emu.localization("Room") + ": " + roomName;
-        content.appendChild(roomLabel);
-        const errorBox = this.emu.createElement("div");
-        errorBox.classList.add("ejs-netplay_error_box");
-        errorBox.innerText = errorMessage;
-        content.appendChild(errorBox);
-        popups[1].appendChild(content);
-        const buttonRow = this.emu.createElement("div");
-        buttonRow.classList.add("ejs-netplay_dialog_buttons");
-
-        if (hadPassword) {
-            const retryBtn = this.emu.createElement("button");
-            retryBtn.classList.add("ejs-button_button", "ejs-popup_submit");
-            retryBtn.style.backgroundColor = "rgba(var(--ejs-primary-color),1)";
-            retryBtn.innerText = this.emu.localization("Try Again");
-            this.emu.addEventListener(retryBtn, "click", () => {
-                popups[0].remove();
-                this.showJoinPasswordDialog(roomId, roomName, maxPlayers);
-            });
-            buttonRow.appendChild(retryBtn);
-        }
-
-        const closeBtn = this.emu.createElement("button");
-        closeBtn.classList.add("ejs-button_button", "ejs-popup_submit");
-        closeBtn.innerText = this.emu.localization("Close");
-        this.emu.addEventListener(closeBtn, "click", () => { popups[0].remove(); });
-        buttonRow.appendChild(closeBtn);
-        popups[1].appendChild(buttonRow);
+        this.menuUI.showJoinErrorDialog(roomId, roomName, maxPlayers, errorMessage, hadPassword);
     }
 
     /** Initialize Socket.IO connection and set up event handlers */
@@ -1889,7 +1418,7 @@ export class Netplay {
         this.previousPlayers = {};
         this.socket = io(this.url);
 
-        this.socket.on("connect", () => { this.bindChatUI(); cb(); });
+        this.socket.on("connect", () => { this.menuUI.bindChatUI(); cb(); });
         this.socket.on("connect_error", (e) => { this.emu.displayMessage("Connect error: " + e.message, 5000); });
         this.socket.on("disconnect", () => { this.leaveRoom(); });
 
@@ -1910,8 +1439,8 @@ export class Netplay {
 
             this.previousPlayers = users;
             this.players = users;
-            this.updatePlayersTable();
-            this.chatRefreshRecipients();
+            this.menuUI.updatePlayersTable();
+            this.menuUI.chatRefreshRecipients();
 
             // Host creates peer connections for new players
             if (this.owner) {
@@ -2005,24 +1534,9 @@ export class Netplay {
         });
     }
 
-    /** Refresh player table UI */
+    /** Refresh player table UI — delegates to UI layer */
     updatePlayersTable() {
-        if (!this.playerTable) return;
-        this.playerTable.innerHTML = "";
-        let i = 0;
-        const keys = Object.keys(this.players || {});
-        keys.forEach((k) => {
-            const row = this.emu.createElement("tr");
-            const values = [i + 1, this.players[k].player_name || "Unknown", i === 0 ? keys.length + "/" + (this.maxPlayers || "?") : ""];
-            values.forEach((t) => {
-                const td = this.emu.createElement("td");
-                td.innerText = t;
-                row.appendChild(td);
-            });
-            this.playerTable.appendChild(row);
-            i++;
-        });
-        this.chatRefreshRecipients();
+        this.menuUI.updatePlayersTable();
     }
 
     /** Create and host a new room */
@@ -2077,7 +1591,7 @@ export class Netplay {
 
         this.startSocketIO(() => {
             this.socket.emit("join-room", { extra: this.extra, password: pw }, (e, u) => {
-                if (e) { this.showJoinErrorDialog(sid, rn, mp, e, !!pw); return; }
+                if (e) { this.menuUI.showJoinErrorDialog(sid, rn, mp, e, !!pw); return; }
                 this.players = u;
                 this.roomJoined(false, rn, pw, sid);
             });
@@ -2096,11 +1610,11 @@ export class Netplay {
             const from = chat.from || "";
             if (to !== "all" && to !== this.playerID) return;
             if (from === this.playerID) return;
-            this.chatAppend(chat);
+            this.menuUI.chatAppend(chat);
             try {
                 const name = chat.player_name || "Player";
                 const msg = chat.message || "";
-                const typing = this.chatInput && document.activeElement === this.chatInput;
+                const typing = this.menuUI.chatInput && document.activeElement === this.menuUI.chatInput;
                 if (!typing && this.emu.displayMessage) {
                     const prefix = (to !== "all") ? "(private) " : "";
                     this.emu.displayMessage(prefix + name + ": " + msg, 4500);
