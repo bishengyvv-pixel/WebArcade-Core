@@ -37,11 +37,28 @@ async function doMinify() {
         });
         console.log("Bundled and Minified JS");
 
+        // Concatenate split CSS modules in order, then minify
+        const cssModules = [
+            "data/src/css/base.css",
+            "data/src/css/menu.css",
+            "data/src/css/gamepad.css",
+            "data/src/css/popup.css",
+            "data/src/css/ads.css",
+        ];
+        const cssConcatPath = path.join(rootPath, "data/.css-concat.tmp");
+        let combinedCss = "";
+        for (const mod of cssModules) {
+            combinedCss += await fs.readFile(path.join(rootPath, mod), "utf8");
+            combinedCss += "\n";
+        }
+        await fs.writeFile(cssConcatPath, combinedCss);
+
         await minify({
             compressor: cleanCss,
-            input: path.join(rootPath, "data/emulator.css"),
+            input: cssConcatPath,
             output: path.join(rootPath, "data/emulator.min.css"),
         });
+        await fs.unlink(cssConcatPath);
         console.log("Minified CSS");
     } catch(e) {
         console.error(e);

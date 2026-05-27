@@ -2,20 +2,20 @@
 
 export function setupSettingsMenu(emu) {
         emu.settingsMenu = emu.createElement("div");
-        emu.settingsMenu.classList.add("ejs_settings_parent");
+        emu.settingsMenu.classList.add("ejs-settings_parent");
         const nested = emu.createElement("div");
-        nested.classList.add("ejs_settings_transition");
+        nested.classList.add("ejs-settings_transition");
         emu.settings = {};
         const menus = [];
         let parentMenuCt = 0;
 
         const createSettingParent = (child, title, parentElement) => {
             const rv = emu.createElement("div");
-            rv.classList.add("ejs_setting_menu");
+            rv.classList.add("ejs-setting_menu");
 
             if (child) {
                 const menuOption = emu.createElement("div");
-                menuOption.classList.add("ejs_settings_main_bar");
+                menuOption.classList.add("ejs-settings_main_bar");
                 const span = emu.createElement("span");
                 span.innerText = title;
 
@@ -27,7 +27,7 @@ export function setupSettingsMenu(emu) {
                 menus.push(menu);
                 parentMenuCt++;
                 menu.setAttribute("hidden", "");
-                menuChild.classList.add("ejs_parent_option_div");
+                menuChild.classList.add("ejs-parent_option_div");
                 const button = emu.createElement("button");
                 const goToHome = () => {
                     const homeSize = emu.getElementSize(parentElement);
@@ -65,15 +65,15 @@ export function setupSettingsMenu(emu) {
                 emu.addEventListener(button, "click", goToHome);
 
                 button.type = "button";
-                button.classList.add("ejs_back_button");
+                button.classList.add("ejs-back_button");
                 menuChild.appendChild(button);
                 const pageTitle = emu.createElement("span");
                 pageTitle.innerText = title;
-                pageTitle.classList.add("ejs_menu_text_a");
+                pageTitle.classList.add("ejs-menu_text_a");
                 button.appendChild(pageTitle);
                 
                 // const optionsMenu = emu.createElement("div");
-                // optionsMenu.classList.add("ejs_setting_menu");
+                // optionsMenu.classList.add("ejs-setting_menu");
                 // menu.appendChild(optionsMenu);
 
                 menuChild.appendChild(rv);
@@ -115,8 +115,8 @@ export function setupSettingsMenu(emu) {
             for (let i = 0; i < menus.length; i++) {
                 menus[i].style["max-height"] = (height - 95) + "px";
             }
-            emu.settingsMenu.classList.toggle("ejs_settings_center_left", !onTheRight);
-            emu.settingsMenu.classList.toggle("ejs_settings_center_right", onTheRight);
+            emu.settingsMenu.classList.toggle("ejs-settings_center_left", !onTheRight);
+            emu.settingsMenu.classList.toggle("ejs-settings_center_right", onTheRight);
             if (needChange) {
                 emu.settingsMenu.style.display = "none";
                 emu.settingsMenu.style.opacity = "";
@@ -143,13 +143,13 @@ export function setupSettingsMenu(emu) {
             parentElement = parentElement || home;
             const transitionElement = useParentParent ? parentElement.parentElement.parentElement : parentElement;
             const menuOption = emu.createElement("div");
-            menuOption.classList.add("ejs_settings_main_bar");
+            menuOption.classList.add("ejs-settings_main_bar");
             const span = emu.createElement("span");
             span.innerText = title;
 
             const current = emu.createElement("div");
             current.innerText = "";
-            current.classList.add("ejs_settings_main_bar_selected");
+            current.classList.add("ejs-settings_main_bar_selected");
             span.appendChild(current);
 
             menuOption.appendChild(span);
@@ -159,10 +159,10 @@ export function setupSettingsMenu(emu) {
             menus.push(menu);
             const menuChild = emu.createElement("div");
             menu.setAttribute("hidden", "");
-            menuChild.classList.add("ejs_parent_option_div");
+            menuChild.classList.add("ejs-parent_option_div");
 
             const optionsMenu = emu.createElement("div");
-            optionsMenu.classList.add("ejs_setting_menu");
+            optionsMenu.classList.add("ejs-setting_menu");
 
             const button = emu.createElement("button");
             const goToHome = () => {
@@ -185,11 +185,11 @@ export function setupSettingsMenu(emu) {
             emu.addEventListener(button, "click", goToHome);
 
             button.type = "button";
-            button.classList.add("ejs_back_button");
+            button.classList.add("ejs-back_button");
             menuChild.appendChild(button);
             const pageTitle = emu.createElement("span");
             pageTitle.innerText = title;
-            pageTitle.classList.add("ejs_menu_text_a");
+            pageTitle.classList.add("ejs-menu_text_a");
             button.appendChild(pageTitle);
 
             let buttons = [];
@@ -205,7 +205,7 @@ export function setupSettingsMenu(emu) {
             funcs.push((title) => {
                 if (id !== title) return;
                 for (let j = 0; j < buttons.length; j++) {
-                    buttons[j].classList.toggle("ejs_option_row_selected", buttons[j].getAttribute("ejs_value") === settings[id]);
+                    buttons[j].classList.toggle("ejs-option_row_selected", buttons[j].getAttribute("ejs_value") === settings[id]);
                 }
                 emu.menuOptionChanged(id, settings[id]);
                 current.innerText = opts[settings[id]];
@@ -217,21 +217,21 @@ export function setupSettingsMenu(emu) {
                 optionButton.setAttribute("ejs_value", opt);
                 optionButton.type = "button";
                 optionButton.value = opts[opt];
-                optionButton.classList.add("ejs_option_row");
-                optionButton.classList.add("ejs_button_style");
+                optionButton.classList.add("ejs-option_row");
+                optionButton.classList.add("ejs-button_style");
 
                 emu.addEventListener(optionButton, "click", (e) => {
                     emu.changeSettingOption(id, opt);
                     for (let j = 0; j < buttons.length; j++) {
-                        buttons[j].classList.remove("ejs_option_row_selected");
+                        buttons[j].classList.remove("ejs-option_row_selected");
                     }
-                    optionButton.classList.add("ejs_option_row_selected");
+                    optionButton.classList.add("ejs-option_row_selected");
                     emu.menuOptionChanged(id, opt);
                     current.innerText = opts[opt];
                     goToHome();
                 })
                 if (defaultOption === opt) {
-                    optionButton.classList.add("ejs_option_row_selected");
+                    optionButton.classList.add("ejs-option_row_selected");
                     emu.menuOptionChanged(id, opt);
                     current.innerText = opts[opt];
                 }

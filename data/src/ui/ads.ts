@@ -7,7 +7,7 @@ import { createElement, addEventListener } from "./dom.js";
 export function setupAds(emu, ads, width, height) {
     const div = createElement("div");
     const time = (typeof emu.config.adMode === "number" && emu.config.adMode > -1 && emu.config.adMode < 3) ? emu.config.adMode : 2;
-    div.classList.add("ejs_ad_iframe");
+    div.classList.add("ejs-ad_iframe");
     const frame = createElement("iframe");
     frame.src = ads;
     frame.setAttribute("scrolling", "no");
@@ -15,7 +15,7 @@ export function setupAds(emu, ads, width, height) {
     frame.style.width = width;
     frame.style.height = height;
     const closeParent = createElement("div");
-    closeParent.classList.add("ejs_ad_close");
+    closeParent.classList.add("ejs-ad_close");
     const closeButton = createElement("a");
     closeParent.appendChild(closeButton);
     closeParent.setAttribute("hidden", "");
@@ -48,10 +48,10 @@ export function setupAds(emu, ads, width, height) {
 
 export function adBlocked(emu, url, del) {
     if (del) {
-        document.querySelector('div[class="ejs_ad_iframe"]').remove();
+        document.querySelector('div[class="ejs-ad_iframe"]').remove();
     } else {
         try {
-            document.querySelector('div[class="ejs_ad_iframe"]').remove();
+            document.querySelector('div[class="ejs-ad_iframe"]').remove();
         } catch(e) {}
         emu.config.adUrl = url;
         setupAds(emu, emu.config.adUrl, emu.config.adSize[0], emu.config.adSize[1]);

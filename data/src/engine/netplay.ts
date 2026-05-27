@@ -242,7 +242,7 @@ export class Netplay {
         title.innerText = this.emu.localization("Rooms");
 
         const table = this.emu.createElement("table");
-        table.classList.add("ejs_netplay_table");
+        table.classList.add("ejs-netplay_table");
         table.style.width = "100%";
         table.setAttribute("cellspacing", "0");
 
@@ -275,7 +275,7 @@ export class Netplay {
         password.innerText = "Password: ";
 
         const table2 = this.emu.createElement("table");
-        table2.classList.add("ejs_netplay_table");
+        table2.classList.add("ejs-netplay_table");
         table2.style.width = "100%";
         table2.setAttribute("cellspacing", "0");
 
@@ -301,11 +301,11 @@ export class Netplay {
 
         // Chat UI
         const chatWrap = this.emu.createElement("div");
-        chatWrap.classList.add("ejs_netplay_chat_container");
+        chatWrap.classList.add("ejs-netplay_chat_container");
         chatWrap.style.marginTop = "10px";
 
         const chatHeaderRow = this.emu.createElement("div");
-        chatHeaderRow.classList.add("ejs_netplay_chat_header_row");
+        chatHeaderRow.classList.add("ejs-netplay_chat_header_row");
         chatWrap.appendChild(chatHeaderRow);
 
         const chatTitle = this.emu.createElement("strong");
@@ -313,20 +313,20 @@ export class Netplay {
         chatHeaderRow.appendChild(chatTitle);
 
         const chatHint = this.emu.createElement("span");
-        chatHint.classList.add("ejs_netplay_chat_hint");
+        chatHint.classList.add("ejs-netplay_chat_hint");
         chatHint.innerText = this.emu.localization("Everyone or private");
         chatHeaderRow.appendChild(chatHint);
 
         const chatLog = this.emu.createElement("div");
-        chatLog.classList.add("ejs_netplay_chat_log");
+        chatLog.classList.add("ejs-netplay_chat_log");
         chatWrap.appendChild(chatLog);
 
         const chatRow = this.emu.createElement("div");
-        chatRow.classList.add("ejs_netplay_chat_row");
+        chatRow.classList.add("ejs-netplay_chat_row");
         chatWrap.appendChild(chatRow);
 
         const chatTo = this.emu.createElement("select");
-        chatTo.classList.add("ejs_netplay_chat_to");
+        chatTo.classList.add("ejs-netplay_chat_to");
         const optAll = document.createElement("option");
         optAll.value = "all";
         optAll.innerText = this.emu.localization("Everyone");
@@ -337,11 +337,11 @@ export class Netplay {
         chatInput.type = "text";
         chatInput.maxLength = 300;
         chatInput.placeholder = this.emu.localization("Type a message...");
-        chatInput.classList.add("ejs_netplay_chat_input");
+        chatInput.classList.add("ejs-netplay_chat_input");
         chatRow.appendChild(chatInput);
 
         const chatSend = this.emu.createElement("button");
-        chatSend.classList.add("ejs_button_button");
+        chatSend.classList.add("ejs-button_button");
         chatSend.style.height = "34px";
         chatSend.style.minWidth = "70px";
         chatSend.innerText = this.emu.localization("Send");
@@ -369,7 +369,7 @@ export class Netplay {
             // Show TURN warning if needed
             if (this.emu.netplayShowTurnWarning && !this._warningShown) {
                 const warningDiv = this.emu.createElement("div");
-                warningDiv.className = "ejs_netplay_warning";
+                warningDiv.className = "ejs-netplay_warning";
                 warningDiv.innerText = "Warning: No TURN server configured. Netplay connections may fail.";
                 const menuBody = this._menuElement.querySelector(".ejs_popup_body");
                 if (menuBody) {
@@ -394,18 +394,18 @@ export class Netplay {
             if (!this.name) {
                 const popups = this.emu.createSubPopup();
                 this._menuElement.appendChild(popups[0]);
-                popups[1].classList.add("ejs_cheat_parent");
+                popups[1].classList.add("ejs-cheat_parent");
                 const popup = popups[1];
 
                 const header = this.emu.createElement("div");
                 const nameTitle = this.emu.createElement("h2");
                 nameTitle.innerText = this.emu.localization("Set Player Name");
-                nameTitle.classList.add("ejs_netplay_name_heading");
+                nameTitle.classList.add("ejs-netplay_name_heading");
                 header.appendChild(nameTitle);
                 popup.appendChild(header);
 
                 const main = this.emu.createElement("div");
-                main.classList.add("ejs_netplay_header");
+                main.classList.add("ejs-netplay_header");
                 const head = this.emu.createElement("strong");
                 head.innerText = this.emu.localization("Player Name");
                 const input = this.emu.createElement("input");
@@ -425,13 +425,13 @@ export class Netplay {
                 popup.appendChild(buttonRow);
 
                 const submit = this.emu.createElement("button");
-                submit.classList.add("ejs_button_button", "ejs_popup_submit");
+                submit.classList.add("ejs-button_button", "ejs-popup_submit");
                 submit.style.backgroundColor = "rgba(var(--ejs-primary-color),1)";
                 submit.innerText = this.emu.localization("Submit");
                 buttonRow.appendChild(submit);
 
                 const cancel = this.emu.createElement("button");
-                cancel.classList.add("ejs_button_button", "ejs_popup_submit");
+                cancel.classList.add("ejs-button_button", "ejs-popup_submit");
                 cancel.innerText = this.emu.localization("Cancel");
                 buttonRow.appendChild(cancel);
 
@@ -1009,13 +1009,13 @@ export class Netplay {
             this.freezeGuest();
 
             if (this.emu.canvas) {
-                this.emu.canvas.classList.add("ejs_netplay_offscreen_canvas");
+                this.emu.canvas.classList.add("ejs-netplay_offscreen_canvas");
             }
 
             // Create overlay canvas for remote video
             if (!this.emu.netplayCanvas) {
                 this.emu.netplayCanvas = this.emu.createElement("canvas");
-                this.emu.netplayCanvas.classList.add("ejs_canvas");
+                this.emu.netplayCanvas.classList.add("ejs-canvas");
             }
 
             Object.assign(this.emu.netplayCanvas.style, {
@@ -1576,7 +1576,7 @@ export class Netplay {
 
         // Show original emulator canvas
         if (this.emu.canvas) {
-            this.emu.canvas.classList.remove("ejs_netplay_offscreen_canvas");
+            this.emu.canvas.classList.remove("ejs-netplay_offscreen_canvas");
         }
 
         if (!this.owner) {
@@ -1706,7 +1706,7 @@ export class Netplay {
             for (const k in rooms) {
                 ((id, r) => {
                     const row = this.emu.createElement("tr");
-                    row.classList.add("ejs_netplay_table_row");
+                    row.classList.add("ejs-netplay_table_row");
                     const c1 = this.emu.createElement("td");
                     c1.innerText = r.room_name; c1.style.textAlign = "left"; c1.style.padding = "10px 0";
                     const c2 = this.emu.createElement("td");
@@ -1715,7 +1715,7 @@ export class Netplay {
                     c3.style.width = "80px";
                     if (r.current < r.max) {
                         const btn = this.emu.createElement("button");
-                        btn.classList.add("ejs_netplay_join_button", "ejs_button_button");
+                        btn.classList.add("ejs-netplay_join_button", "ejs-button_button");
                         btn.style.backgroundColor = "rgba(var(--ejs-primary-color),1)";
                         btn.innerText = this.emu.localization("Join");
                         c3.appendChild(btn);
@@ -1742,13 +1742,13 @@ export class Netplay {
         this.emu.originalControls = JSON.parse(JSON.stringify(this.emu.controls));
         const popups = this.emu.createSubPopup();
         this._menuElement.appendChild(popups[0]);
-        popups[1].classList.add("ejs_cheat_parent");
+        popups[1].classList.add("ejs-cheat_parent");
         const title = this.emu.createElement("h2");
         title.innerText = this.emu.localization("Create a room");
-        title.classList.add("ejs_netplay_name_heading");
+        title.classList.add("ejs-netplay_name_heading");
         popups[1].appendChild(title);
         const form = this.emu.createElement("div");
-        form.classList.add("ejs_netplay_header");
+        form.classList.add("ejs-netplay_header");
         const ni = this.emu.createElement("input"); ni.type = "text"; ni.maxLength = 20;
         const ms = this.emu.createElement("select");
         ["2", "3", "4"].forEach((v) => { const o = document.createElement("option"); o.value = v; o.innerText = v; ms.appendChild(o); });
@@ -1760,7 +1760,7 @@ export class Netplay {
         });
         popups[1].appendChild(form);
         const sub = this.emu.createElement("button");
-        sub.classList.add("ejs_button_button", "ejs_popup_submit");
+        sub.classList.add("ejs-button_button", "ejs-popup_submit");
         sub.style.backgroundColor = "rgba(var(--ejs-primary-color),1)";
         sub.style.margin = "10px";
         sub.innerText = this.emu.localization("Submit");
@@ -1769,7 +1769,7 @@ export class Netplay {
             if (n) { this.openRoom(n, parseInt(ms.value, 10), pw.value.trim()); popups[0].remove(); }
         });
         const cls = this.emu.createElement("button");
-        cls.classList.add("ejs_button_button", "ejs_popup_submit");
+        cls.classList.add("ejs-button_button", "ejs-popup_submit");
         cls.style.margin = "10px";
         cls.innerText = this.emu.localization("Close");
         this.emu.addEventListener(cls, "click", () => { popups[0].remove(); });
@@ -1781,15 +1781,15 @@ export class Netplay {
         if (!this.emu.createSubPopup) return;
         const popups = this.emu.createSubPopup();
         this._menuElement.appendChild(popups[0]);
-        popups[1].classList.add("ejs_cheat_parent");
+        popups[1].classList.add("ejs-cheat_parent");
         const title = this.emu.createElement("h2");
         title.innerText = this.emu.localization("Enter Password");
-        title.classList.add("ejs_netplay_name_heading");
+        title.classList.add("ejs-netplay_name_heading");
         popups[1].appendChild(title);
         const form = this.emu.createElement("div");
-        form.classList.add("ejs_netplay_header");
+        form.classList.add("ejs-netplay_header");
         const roomLabel = this.emu.createElement("div");
-        roomLabel.classList.add("ejs_netplay_dialog_label");
+        roomLabel.classList.add("ejs-netplay_dialog_label");
         roomLabel.innerText = this.emu.localization("Room") + ": " + roomName;
         form.appendChild(roomLabel);
         const pwLabel = this.emu.createElement("strong");
@@ -1800,13 +1800,13 @@ export class Netplay {
         form.appendChild(pwInput);
         popups[1].appendChild(form);
         const buttonRow = this.emu.createElement("div");
-        buttonRow.classList.add("ejs_netplay_dialog_buttons");
+        buttonRow.classList.add("ejs-netplay_dialog_buttons");
         const joinBtn = this.emu.createElement("button");
-        joinBtn.classList.add("ejs_button_button", "ejs_popup_submit");
+        joinBtn.classList.add("ejs-button_button", "ejs-popup_submit");
         joinBtn.style.backgroundColor = "rgba(var(--ejs-primary-color),1)";
         joinBtn.innerText = this.emu.localization("Join");
         const cancelBtn = this.emu.createElement("button");
-        cancelBtn.classList.add("ejs_button_button", "ejs_popup_submit");
+        cancelBtn.classList.add("ejs-button_button", "ejs-popup_submit");
         cancelBtn.innerText = this.emu.localization("Cancel");
 
         this.emu.addEventListener(joinBtn, "click", () => {
@@ -1840,28 +1840,28 @@ export class Netplay {
         }
         const popups = this.emu.createSubPopup();
         this._menuElement.appendChild(popups[0]);
-        popups[1].classList.add("ejs_cheat_parent");
+        popups[1].classList.add("ejs-cheat_parent");
         const title = this.emu.createElement("h2");
         title.innerText = this.emu.localization("Unable to Join");
-        title.classList.add("ejs_netplay_name_heading");
+        title.classList.add("ejs-netplay_name_heading");
         popups[1].appendChild(title);
         const content = this.emu.createElement("div");
-        content.classList.add("ejs_netplay_header");
+        content.classList.add("ejs-netplay_header");
         const roomLabel = this.emu.createElement("div");
-        roomLabel.classList.add("ejs_netplay_dialog_label");
+        roomLabel.classList.add("ejs-netplay_dialog_label");
         roomLabel.innerText = this.emu.localization("Room") + ": " + roomName;
         content.appendChild(roomLabel);
         const errorBox = this.emu.createElement("div");
-        errorBox.classList.add("ejs_netplay_error_box");
+        errorBox.classList.add("ejs-netplay_error_box");
         errorBox.innerText = errorMessage;
         content.appendChild(errorBox);
         popups[1].appendChild(content);
         const buttonRow = this.emu.createElement("div");
-        buttonRow.classList.add("ejs_netplay_dialog_buttons");
+        buttonRow.classList.add("ejs-netplay_dialog_buttons");
 
         if (hadPassword) {
             const retryBtn = this.emu.createElement("button");
-            retryBtn.classList.add("ejs_button_button", "ejs_popup_submit");
+            retryBtn.classList.add("ejs-button_button", "ejs-popup_submit");
             retryBtn.style.backgroundColor = "rgba(var(--ejs-primary-color),1)";
             retryBtn.innerText = this.emu.localization("Try Again");
             this.emu.addEventListener(retryBtn, "click", () => {
@@ -1872,7 +1872,7 @@ export class Netplay {
         }
 
         const closeBtn = this.emu.createElement("button");
-        closeBtn.classList.add("ejs_button_button", "ejs_popup_submit");
+        closeBtn.classList.add("ejs-button_button", "ejs-popup_submit");
         closeBtn.innerText = this.emu.localization("Close");
         this.emu.addEventListener(closeBtn, "click", () => { popups[0].remove(); });
         buttonRow.appendChild(closeBtn);

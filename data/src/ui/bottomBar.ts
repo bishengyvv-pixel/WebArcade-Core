@@ -8,40 +8,40 @@ export function createBottomMenuBar(emu) {
         emu.on("start", (e) => {
             emu.elements.menu.style.opacity = "";
         })
-        emu.elements.menu.classList.add("ejs_menu_bar");
-        emu.elements.menu.classList.add("ejs_menu_bar_hidden");
+        emu.elements.menu.classList.add("ejs-menu_bar");
+        emu.elements.menu.classList.add("ejs-menu_bar_hidden");
 
         let timeout = null;
         let ignoreEvents = false;
         const hide = () => {
             if (emu.paused || emu.settingsMenuOpen || emu.disksMenuOpen) return;
-            emu.elements.menu.classList.add("ejs_menu_bar_hidden");
+            emu.elements.menu.classList.add("ejs-menu_bar_hidden");
         }
 
         const show = () => {
             clearTimeout(timeout);
             timeout = setTimeout(hide, 3000);
-            emu.elements.menu.classList.remove("ejs_menu_bar_hidden");
+            emu.elements.menu.classList.remove("ejs-menu_bar_hidden");
         }
 
         emu.menu = {
             close: () => {
                 clearTimeout(timeout);
-                emu.elements.menu.classList.add("ejs_menu_bar_hidden");
+                emu.elements.menu.classList.add("ejs-menu_bar_hidden");
             },
             open: (force) => {
                 if (!emu.started && force !== true) return;
                 clearTimeout(timeout);
                 if (force !== true) timeout = setTimeout(hide, 3000);
-                emu.elements.menu.classList.remove("ejs_menu_bar_hidden");
+                emu.elements.menu.classList.remove("ejs-menu_bar_hidden");
             },
             toggle: () => {
                 if (!emu.started) return;
                 clearTimeout(timeout);
-                if (emu.elements.menu.classList.contains("ejs_menu_bar_hidden")) {
+                if (emu.elements.menu.classList.contains("ejs-menu_bar_hidden")) {
                     timeout = setTimeout(hide, 3000);
                 }
-                emu.elements.menu.classList.toggle("ejs_menu_bar_hidden");
+                emu.elements.menu.classList.toggle("ejs-menu_bar_hidden");
             }
         }
 
@@ -86,7 +86,7 @@ export function createBottomMenuBar(emu) {
         let tmout;
         emu.addEventListener(emu.elements.parent, "mousedown touchstart", (e) => {
             if (emu.isChild(emu.elements.menu, e.target) || emu.isChild(emu.elements.menuToggle, e.target)) return;
-            if (!emu.started || emu.elements.menu.classList.contains("ejs_menu_bar_hidden") || emu.isPopupOpen()) return;
+            if (!emu.started || emu.elements.menu.classList.contains("ejs-menu_bar_hidden") || emu.isPopupOpen()) return;
             const width = emu.elements.parent.getBoundingClientRect().width;
             if (width > 575) return;
             clearTimeout(tmout);
@@ -108,10 +108,10 @@ export function createBottomMenuBar(emu) {
             svg.innerHTML = buttonConfig.icon;
             const text = emu.createElement("span");
             text.innerText = emu.localization(buttonConfig.displayName);
-            if (paddingSet) text.classList.add("ejs_menu_text_right");
-            text.classList.add("ejs_menu_text");
+            if (paddingSet) text.classList.add("ejs-menu_text_right");
+            text.classList.add("ejs-menu_text");
 
-            button.classList.add("ejs_menu_button");
+            button.classList.add("ejs-menu_button");
             button.appendChild(svg);
             button.appendChild(text);
             if (element) {
@@ -296,12 +296,12 @@ export function createBottomMenuBar(emu) {
         }
 
         const spacer = emu.createElement("span");
-        spacer.classList.add("ejs_menu_bar_spacer");
+        spacer.classList.add("ejs-menu_bar_spacer");
         emu.elements.menu.appendChild(spacer);
         paddingSet = true;
 
         const volumeSettings = emu.createElement("div");
-        volumeSettings.classList.add("ejs_volume_parent");
+        volumeSettings.classList.add("ejs-volume_parent");
         const muteButton = addButton(emu.config.buttonOpts.mute, () => {
             muteButton.style.display = "none";
             unmuteButton.style.display = "";
@@ -381,16 +381,16 @@ export function createBottomMenuBar(emu) {
         emu.disksMenuOpen = false;
         const diskButton = addButton(emu.config.buttonOpts.diskButton, () => {
             emu.disksMenuOpen = !emu.disksMenuOpen;
-            diskButton[1].classList.toggle("ejs_svg_rotate", emu.disksMenuOpen);
+            diskButton[1].classList.toggle("ejs-svg_rotate", emu.disksMenuOpen);
             emu.disksMenu.style.display = emu.disksMenuOpen ? "" : "none";
-            diskButton[2].classList.toggle("ejs_disks_text", emu.disksMenuOpen);
+            diskButton[2].classList.toggle("ejs-disks_text", emu.disksMenuOpen);
         }, emu.diskParent, true);
         emu.elements.menu.appendChild(emu.diskParent);
         emu.closeDisksMenu = () => {
             if (!emu.disksMenu) return;
             emu.disksMenuOpen = false;
-            diskButton[1].classList.toggle("ejs_svg_rotate", emu.disksMenuOpen);
-            diskButton[2].classList.toggle("ejs_disks_text", emu.disksMenuOpen);
+            diskButton[1].classList.toggle("ejs-svg_rotate", emu.disksMenuOpen);
+            diskButton[2].classList.toggle("ejs-disks_text", emu.disksMenuOpen);
             emu.disksMenu.style.display = "none";
         }
         emu.addEventListener(emu.elements.parent, "mousedown touchstart", (e) => {
@@ -404,16 +404,16 @@ export function createBottomMenuBar(emu) {
         emu.settingsMenuOpen = false;
         const settingButton = addButton(emu.config.buttonOpts.settings, () => {
             emu.settingsMenuOpen = !emu.settingsMenuOpen;
-            settingButton[1].classList.toggle("ejs_svg_rotate", emu.settingsMenuOpen);
+            settingButton[1].classList.toggle("ejs-svg_rotate", emu.settingsMenuOpen);
             emu.settingsMenu.style.display = emu.settingsMenuOpen ? "" : "none";
-            settingButton[2].classList.toggle("ejs_settings_text", emu.settingsMenuOpen);
+            settingButton[2].classList.toggle("ejs-settings_text", emu.settingsMenuOpen);
         }, emu.settingParent, true);
         emu.elements.menu.appendChild(emu.settingParent);
         emu.closeSettingsMenu = () => {
             if (!emu.settingsMenu) return;
             emu.settingsMenuOpen = false;
-            settingButton[1].classList.toggle("ejs_svg_rotate", emu.settingsMenuOpen);
-            settingButton[2].classList.toggle("ejs_settings_text", emu.settingsMenuOpen);
+            settingButton[1].classList.toggle("ejs-svg_rotate", emu.settingsMenuOpen);
+            settingButton[2].classList.toggle("ejs-settings_text", emu.settingsMenuOpen);
             emu.settingsMenu.style.display = "none";
         }
         emu.addEventListener(emu.elements.parent, "mousedown touchstart", (e) => {
@@ -488,16 +488,16 @@ export function createBottomMenuBar(emu) {
                 exitMenuIsOpen = true;
                 const popups = emu.createSubPopup();
                 emu.game.appendChild(popups[0]);
-                popups[1].classList.add("ejs_cheat_parent");
+                popups[1].classList.add("ejs-cheat_parent");
                 popups[1].style.width = "100%";
                 const popup = popups[1];
                 const header = emu.createElement("div");
-                header.classList.add("ejs_cheat_header");
+                header.classList.add("ejs-cheat_header");
                 const title = emu.createElement("h2");
                 title.innerText = emu.localization("Are you sure you want to exit?");
-                title.classList.add("ejs_cheat_heading");
+                title.classList.add("ejs-cheat_heading");
                 const close = emu.createElement("button");
-                close.classList.add("ejs_cheat_close");
+                close.classList.add("ejs-cheat_close");
                 header.appendChild(title);
                 header.appendChild(close);
                 popup.appendChild(header);
@@ -512,10 +512,10 @@ export function createBottomMenuBar(emu) {
                 const closeButton = emu.createElement("button");
                 submit.innerText = emu.localization("Exit");
                 closeButton.innerText = emu.localization("Cancel");
-                submit.classList.add("ejs_button_button");
-                closeButton.classList.add("ejs_button_button");
-                submit.classList.add("ejs_popup_submit");
-                closeButton.classList.add("ejs_popup_submit");
+                submit.classList.add("ejs-button_button");
+                closeButton.classList.add("ejs-button_button");
+                submit.classList.add("ejs-popup_submit");
+                closeButton.classList.add("ejs-popup_submit");
                 submit.style["background-color"] = "rgba(var(--ejs-primary-color),1)";
                 footer.appendChild(submit);
                 const span = emu.createElement("span");

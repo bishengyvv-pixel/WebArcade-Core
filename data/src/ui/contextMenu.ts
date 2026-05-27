@@ -3,7 +3,7 @@ import { EJS_license } from "../engine/license.js";
 
 export function createContextMenu(emu) {
         emu.elements.contextmenu = emu.createElement("div");
-        emu.elements.contextmenu.classList.add("ejs_context_menu");
+        emu.elements.contextmenu.classList.add("ejs-context_menu");
         emu.addEventListener(emu.game, "contextmenu", (e) => {
             e.preventDefault();
             if ((emu.config.buttonOpts && emu.config.buttonOpts.rightClick === false) || !emu.started || emu.lightgunActive) return;
@@ -123,7 +123,7 @@ export function createContextMenu(emu) {
 
             const menu = emu.createElement("div");
             body.appendChild(menu);
-            menu.classList.add("ejs_list_selector");
+            menu.classList.add("ejs-list_selector");
             const parent = emu.createElement("ul");
             const addButton = (title, hidden, functi0n) => {
                 const li = emu.createElement("li");
@@ -160,10 +160,10 @@ export function createContextMenu(emu) {
             home.appendChild(emu.createElement("br"));
             home.appendChild(emu.createElement("br"));
 
-            home.classList.add("ejs_context_menu_tab");
-            license.classList.add("ejs_context_menu_tab");
-            retroarch.classList.add("ejs_context_menu_tab");
-            coreLicense.classList.add("ejs_context_menu_tab");
+            home.classList.add("ejs-context_menu_tab");
+            license.classList.add("ejs-context_menu_tab");
+            retroarch.classList.add("ejs-context_menu_tab");
+            coreLicense.classList.add("ejs-context_menu_tab");
 
             emu.createLink(home, "https://github.com/EmulatorJS/EmulatorJS", "View on GitHub", true);
 
@@ -195,15 +195,15 @@ export function createContextMenu(emu) {
                 }
                 let activeLi = li.parentElement.querySelector(".ejs_active_list_element");
                 if (activeLi) {
-                    activeLi.classList.remove("ejs_active_list_element");
+                    activeLi.classList.remove("ejs-active_list_element");
                 }
-                li.classList.add("ejs_active_list_element");
+                li.classList.add("ejs-active_list_element");
                 current = element;
                 element.style.display = "";
             }
             addButton("Home", false, (li) => {
                 setElem(home, li);
-            }).classList.add("ejs_active_list_element");
+            }).classList.add("ejs-active_list_element");
             addButton("EmulatorJS License", false, (li) => {
                 setElem(license, li);
             });

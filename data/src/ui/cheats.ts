@@ -7,16 +7,16 @@ export function createCheatsMenu(emu) {
                 "Add Cheat": () => {
                     const popups = emu.createSubPopup();
                     emu.cheatMenu.appendChild(popups[0]);
-                    popups[1].classList.add("ejs_cheat_parent");
+                    popups[1].classList.add("ejs-cheat_parent");
                     popups[1].style.width = "100%";
                     const popup = popups[1];
                     const header = emu.createElement("div");
-                    header.classList.add("ejs_cheat_header");
+                    header.classList.add("ejs-cheat_header");
                     const title = emu.createElement("h2");
                     title.innerText = emu.localization("Add Cheat Code");
-                    title.classList.add("ejs_cheat_heading");
+                    title.classList.add("ejs-cheat_heading");
                     const close = emu.createElement("button");
-                    close.classList.add("ejs_cheat_close");
+                    close.classList.add("ejs-cheat_close");
                     header.appendChild(title);
                     header.appendChild(close);
                     popup.appendChild(header);
@@ -52,7 +52,7 @@ export function createCheatsMenu(emu) {
                         div.appendChild(emu.createElement("br"));
                         const select = emu.createElement("select");
                         select.style.width = "100%";
-                        select.classList.add("ejs_cheat_code");
+                        select.classList.add("ejs-cheat_code");
                         div.appendChild(select);
                         return {
                             container: div,
@@ -61,7 +61,7 @@ export function createCheatsMenu(emu) {
                     };
 
                     const importDiv = emu.createElement("div");
-                    importDiv.classList.add("ejs_cheat_main");
+                    importDiv.classList.add("ejs-cheat_main");
                     importDiv.style.borderBottom = "1px solid #555";
                     importDiv.style.paddingBottom = "10px";
                     importDiv.style.display = "none";
@@ -82,7 +82,7 @@ export function createCheatsMenu(emu) {
                     popup.appendChild(importDiv);
 
                     const main = emu.createElement("div");
-                    main.classList.add("ejs_cheat_main");
+                    main.classList.add("ejs-cheat_main");
                     const header3 = emu.createElement("strong");
                     header3.innerText = emu.localization(
                         "Manual Entry - Code",
@@ -91,7 +91,7 @@ export function createCheatsMenu(emu) {
                     main.appendChild(emu.createElement("br"));
 
                     const manualCodeTextarea = emu.createElement("textarea");
-                    manualCodeTextarea.classList.add("ejs_cheat_code");
+                    manualCodeTextarea.classList.add("ejs-cheat_code");
                     manualCodeTextarea.style.width = "100%";
                     manualCodeTextarea.style.height = "80px";
                     main.appendChild(manualCodeTextarea);
@@ -106,7 +106,7 @@ export function createCheatsMenu(emu) {
 
                     const manualDescriptionInput = emu.createElement("input");
                     manualDescriptionInput.type = "text";
-                    manualDescriptionInput.classList.add("ejs_cheat_code");
+                    manualDescriptionInput.classList.add("ejs-cheat_code");
                     manualDescriptionInput.style.width = "100%";
                     main.appendChild(manualDescriptionInput);
                     main.appendChild(emu.createElement("br"));
@@ -302,10 +302,10 @@ export function createCheatsMenu(emu) {
                     const closeButton = emu.createElement("button");
                     submit.innerText = emu.localization("Submit");
                     closeButton.innerText = emu.localization("Close");
-                    submit.classList.add("ejs_button_button");
-                    closeButton.classList.add("ejs_button_button");
-                    submit.classList.add("ejs_popup_submit");
-                    closeButton.classList.add("ejs_popup_submit");
+                    submit.classList.add("ejs-button_button");
+                    closeButton.classList.add("ejs-button_button");
+                    submit.classList.add("ejs-popup_submit");
+                    closeButton.classList.add("ejs-popup_submit");
                     submit.style["background-color"] =
                         "rgba(var(--ejs-primary-color),1)";
                     footer.appendChild(submit);
@@ -352,6 +352,6 @@ export function createCheatsMenu(emu) {
         body.appendChild(msg);
         const rows = emu.createElement("div");
         body.appendChild(rows);
-        rows.classList.add("ejs_cheat_rows");
+        rows.classList.add("ejs-cheat_rows");
         emu.elements.cheatRows = rows;
 }

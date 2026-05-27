@@ -405,7 +405,7 @@ class EmulatorJS {
             return false;
         })();
         this.canvas = this.createElement("canvas");
-        this.canvas.classList.add("ejs_canvas");
+        this.canvas.classList.add("ejs-canvas");
         this.videoRotation = ([0, 1, 2, 3].includes(this.config.videoRotation)) ? this.config.videoRotation : this.preGetSetting("videoRotation") || 0;
         this.videoRotationChanged = false;
         this.capture = this.capture || {};
@@ -475,14 +475,14 @@ class EmulatorJS {
         // This is not cache. This is save data
         this.storage.states = new EJS_STORAGE("EmulatorJS-states", "states");
 
-        this.game.classList.add("ejs_game");
+        this.game.classList.add("ejs-game");
         if (typeof this.config.backgroundImg === "string") {
-            this.game.classList.add("ejs_game_background");
-            if (this.config.backgroundBlur) this.game.classList.add("ejs_game_background_blur");
+            this.game.classList.add("ejs-game_background");
+            if (this.config.backgroundBlur) this.game.classList.add("ejs-game_background_blur");
             this.game.setAttribute("style", `--ejs-background-image: url("${this.config.backgroundImg}"); --ejs-background-color: ${this.config.backgroundColor};`);
             this.on("start", () => {
-                this.game.classList.remove("ejs_game_background");
-                if (this.config.backgroundBlur) this.game.classList.remove("ejs_game_background_blur");
+                this.game.classList.remove("ejs-game_background");
+                if (this.config.backgroundBlur) this.game.classList.remove("ejs-game_background_blur");
             })
         } else {
             this.game.setAttribute("style", "--ejs-background-color: " + this.config.backgroundColor + ";");
@@ -576,16 +576,16 @@ class EmulatorJS {
             main: this.game,
             parent: elem
         }
-        this.elements.parent.classList.add("ejs_parent");
+        this.elements.parent.classList.add("ejs-parent");
         this.elements.parent.setAttribute("tabindex", -1);
     }
     // Start button
     createStartButton() {
         const button = this.createElement("div");
-        button.classList.add("ejs_start_button");
+        button.classList.add("ejs-start_button");
         let border = 0;
         if (typeof this.config.backgroundImg === "string") {
-            button.classList.add("ejs_start_button_border");
+            button.classList.add("ejs-start_button_border");
             border = 1;
         }
         button.innerText = (typeof this.config.startBtnName === "string") ? this.config.startBtnName : this.localization("Start Game");
@@ -623,8 +623,8 @@ class EmulatorJS {
     // End start button
     createText() {
         this.textElem = this.createElement("div");
-        this.textElem.classList.add("ejs_loading_text");
-        if (typeof this.config.backgroundImg === "string") this.textElem.classList.add("ejs_loading_text_glow");
+        this.textElem.classList.add("ejs-loading_text");
+        if (typeof this.config.backgroundImg === "string") this.textElem.classList.add("ejs-loading_text_glow");
         this.textElem.innerText = this.localization("Loading...");
         this.elements.parent.appendChild(this.textElem);
     }
@@ -651,7 +651,7 @@ class EmulatorJS {
     startGameError(message) {
         console.log(message);
         this.textElem.innerText = message;
-        this.textElem.classList.add("ejs_error_text");
+        this.textElem.classList.add("ejs-error_text");
 
         this.setupSettingsMenu();
         this.loadSettings();
@@ -1236,8 +1236,8 @@ class EmulatorJS {
             if (this.config.noAutoFocus !== true) this.elements.parent.focus();
             this.textElem.remove();
             this.textElem = null;
-            this.game.classList.remove("ejs_game");
-            this.game.classList.add("ejs_canvas_parent");
+            this.game.classList.remove("ejs-game");
+            this.game.classList.add("ejs-canvas_parent");
             this.game.appendChild(this.canvas);
             this.handleResize();
             this.started = true;
@@ -1287,7 +1287,7 @@ class EmulatorJS {
                     popup = this.createPopup("", {});
                     const button = this.createElement("button");
                     button.innerText = this.localization("Click to resume Emulator");
-                    button.classList.add("ejs_menu_button");
+                    button.classList.add("ejs-menu_button");
                     button.style.width = "25%";
                     button.style.height = "25%";
                     popup.appendChild(button);
@@ -1558,9 +1558,9 @@ class EmulatorJS {
             }
         }
         const positionInfo = this.elements.parent.getBoundingClientRect();
-        this.game.parentElement.classList.toggle("ejs_small_screen", positionInfo.width <= 575);
+        this.game.parentElement.classList.toggle("ejs-small_screen", positionInfo.width <= 575);
         //This wouldnt work using :not()... strange.
-        this.game.parentElement.classList.toggle("ejs_big_screen", positionInfo.width > 575);
+        this.game.parentElement.classList.toggle("ejs-big_screen", positionInfo.width > 575);
 
         if (!this.handleSettingsResize) return;
         this.handleSettingsResize();
@@ -1806,7 +1806,7 @@ class EmulatorJS {
 
         const addToMenu = (desc, checked, code, is_permanent, i) => {
             const row = this.createElement("div");
-            row.classList.add("ejs_cheat_row");
+            row.classList.add("ejs-cheat_row");
             const input = this.createElement("input");
             input.type = "checkbox";
             input.checked = checked;
@@ -1825,7 +1825,7 @@ class EmulatorJS {
             });
             if (!is_permanent) {
                 const close = this.createElement("a");
-                close.classList.add("ejs_cheat_row_button");
+                close.classList.add("ejs-cheat_row_button");
                 close.innerText = "×";
                 row.appendChild(close);
                 close.addEventListener("click", (e) => {

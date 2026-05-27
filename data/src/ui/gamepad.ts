@@ -8,7 +8,7 @@ export function setVirtualGamepad(emu) {
         emu.toggleVirtualGamepad = (show) => {
             emu.virtualGamepad.style.display = show ? "" : "none";
         }
-        emu.virtualGamepad.classList.add("ejs_virtualGamepad_parent");
+        emu.virtualGamepad.classList.add("ejs-virtualGamepad_parent");
         emu.elements.parent.appendChild(emu.virtualGamepad);
 
         const speedControlButtons = [
@@ -304,13 +304,13 @@ export function setVirtualGamepad(emu) {
         info = JSON.parse(JSON.stringify(info));
 
         const up = emu.createElement("div");
-        up.classList.add("ejs_virtualGamepad_top");
+        up.classList.add("ejs-virtualGamepad_top");
         const down = emu.createElement("div");
-        down.classList.add("ejs_virtualGamepad_bottom");
+        down.classList.add("ejs-virtualGamepad_bottom");
         const left = emu.createElement("div");
-        left.classList.add("ejs_virtualGamepad_left");
+        left.classList.add("ejs-virtualGamepad_left");
         const right = emu.createElement("div");
-        right.classList.add("ejs_virtualGamepad_right");
+        right.classList.add("ejs-virtualGamepad_right");
         const elems = { top: up, center: down, left, right };
 
         emu.virtualGamepad.appendChild(up);
@@ -319,10 +319,10 @@ export function setVirtualGamepad(emu) {
         emu.virtualGamepad.appendChild(right);
 
         emu.toggleVirtualGamepadLeftHanded = (enabled) => {
-            left.classList.toggle("ejs_virtualGamepad_left", !enabled);
-            right.classList.toggle("ejs_virtualGamepad_right", !enabled);
-            left.classList.toggle("ejs_virtualGamepad_right", enabled);
-            right.classList.toggle("ejs_virtualGamepad_left", enabled);
+            left.classList.toggle("ejs-virtualGamepad_left", !enabled);
+            right.classList.toggle("ejs-virtualGamepad_right", !enabled);
+            left.classList.toggle("ejs-virtualGamepad_right", enabled);
+            right.classList.toggle("ejs-virtualGamepad_left", enabled);
         }
 
         const leftHandedMode = false;
@@ -365,7 +365,7 @@ export function setVirtualGamepad(emu) {
                 const button = emu.createElement("div");
                 button.style = style;
                 button.innerText = info[i].text;
-                button.classList.add("ejs_virtualGamepad_button", controlSchemeCls);
+                button.classList.add("ejs-virtualGamepad_button", controlSchemeCls);
                 if (info[i].id) {
                     button.classList.add(`b_${info[i].id}`);
                 }
@@ -376,13 +376,13 @@ export function setVirtualGamepad(emu) {
                     e.preventDefault();
                     const isAnalog = emu.analogAxes.includes(value);
                     if (e.type === "touchend" || e.type === "touchcancel") {
-                        e.target.classList.remove("ejs_virtualGamepad_button_down");
+                        e.target.classList.remove("ejs-virtualGamepad_button_down");
                         window.setTimeout(() => {
                             emu.stopAutofire(0, value);
                             emu.gameManager.simulateInput(0, value, 0);
                         })
                     } else {
-                        e.target.classList.add("ejs_virtualGamepad_button_down");
+                        e.target.classList.add("ejs-virtualGamepad_button_down");
                         emu.gameManager.simulateInput(0, value, downValue);
                         if (emu.isAutofireEnabled(0, value) && !isAnalog) {
                             emu.startAutofire(0, value, downValue);
@@ -396,15 +396,15 @@ export function setVirtualGamepad(emu) {
             const container = opts.container;
             const callback = opts.event;
             const dpadMain = emu.createElement("div");
-            dpadMain.classList.add("ejs_dpad_main");
+            dpadMain.classList.add("ejs-dpad_main");
             const vertical = emu.createElement("div");
-            vertical.classList.add("ejs_dpad_vertical");
+            vertical.classList.add("ejs-dpad_vertical");
             const horizontal = emu.createElement("div");
-            horizontal.classList.add("ejs_dpad_horizontal");
+            horizontal.classList.add("ejs-dpad_horizontal");
             const bar1 = emu.createElement("div");
-            bar1.classList.add("ejs_dpad_bar");
+            bar1.classList.add("ejs-dpad_bar");
             const bar2 = emu.createElement("div");
-            bar2.classList.add("ejs_dpad_bar");
+            bar2.classList.add("ejs-dpad_bar");
 
             horizontal.appendChild(bar1);
             vertical.appendChild(bar2);
@@ -451,19 +451,19 @@ export function setVirtualGamepad(emu) {
                     down = (angle < 0 && angle >= -55 ? 1 : 0);
                 }
 
-                dpadMain.classList.toggle("ejs_dpad_up_pressed", up);
-                dpadMain.classList.toggle("ejs_dpad_down_pressed", down);
-                dpadMain.classList.toggle("ejs_dpad_right_pressed", right);
-                dpadMain.classList.toggle("ejs_dpad_left_pressed", left);
+                dpadMain.classList.toggle("ejs-dpad_up_pressed", up);
+                dpadMain.classList.toggle("ejs-dpad_down_pressed", down);
+                dpadMain.classList.toggle("ejs-dpad_right_pressed", right);
+                dpadMain.classList.toggle("ejs-dpad_left_pressed", left);
 
                 callback(up, down, left, right);
             }
             const cancelCb = (e) => {
                 e.preventDefault();
-                dpadMain.classList.remove("ejs_dpad_up_pressed");
-                dpadMain.classList.remove("ejs_dpad_down_pressed");
-                dpadMain.classList.remove("ejs_dpad_right_pressed");
-                dpadMain.classList.remove("ejs_dpad_left_pressed");
+                dpadMain.classList.remove("ejs-dpad_up_pressed");
+                dpadMain.classList.remove("ejs-dpad_down_pressed");
+                dpadMain.classList.remove("ejs-dpad_right_pressed");
+                dpadMain.classList.remove("ejs-dpad_left_pressed");
 
                 callback(0, 0, 0, 0);
             }
@@ -645,7 +645,7 @@ export function setVirtualGamepad(emu) {
         if (emu.touch || emu.hasTouchScreen) {
             const menuButton = emu.createElement("div");
             menuButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z"/></svg>';
-            menuButton.classList.add("ejs_virtualGamepad_open");
+            menuButton.classList.add("ejs-virtualGamepad_open");
             menuButton.style.display = "none";
             emu.on("start", () => {
                 menuButton.style.display = "";

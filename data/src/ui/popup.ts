@@ -7,12 +7,12 @@ import { createElement, addEventListener } from "./dom.js";
 export function createPopup(emu, popupTitle, buttons, hidden) {
     if (!hidden) emu.closePopup();
     const popup = createElement("div");
-    popup.classList.add("ejs_popup_container");
+    popup.classList.add("ejs-popup_container");
     emu.elements.parent.appendChild(popup);
     const title = createElement("h4");
     title.innerText = emu.localization(popupTitle);
     const main = createElement("div");
-    main.classList.add("ejs_popup_body");
+    main.classList.add("ejs-popup_body");
 
     popup.appendChild(title);
     popup.appendChild(main);
@@ -29,7 +29,7 @@ export function createPopup(emu, popupTitle, buttons, hidden) {
                 e.preventDefault();
             });
         }
-        button.classList.add("ejs_button");
+        button.classList.add("ejs-button");
         button.innerText = emu.localization(k);
         popup.appendChild(button);
     }
@@ -44,8 +44,8 @@ export function createPopup(emu, popupTitle, buttons, hidden) {
 
 export function createSubPopup(emu, hidden) {
     const popup = createElement("div");
-    popup.classList.add("ejs_popup_container");
-    popup.classList.add("ejs_popup_container_box");
+    popup.classList.add("ejs-popup_container");
+    popup.classList.add("ejs-popup_container_box");
     const popupMsg = createElement("div");
     popupMsg.innerText = "";
     if (hidden) popup.setAttribute("hidden", "");
@@ -56,7 +56,7 @@ export function createSubPopup(emu, hidden) {
 export function displayMessage(emu, message, time) {
     if (!emu.msgElem) {
         emu.msgElem = createElement("div");
-        emu.msgElem.classList.add("ejs_message");
+        emu.msgElem.classList.add("ejs-message");
         emu.msgElem.style.zIndex = "6";
         emu.elements.parent.appendChild(emu.msgElem);
     }
@@ -91,8 +91,8 @@ export function showInputPrompt(emu, opts) {
         popup.appendChild(input);
 
         const submit = createElement("button");
-        submit.classList.add("ejs_button_button");
-        submit.classList.add("ejs_popup_submit");
+        submit.classList.add("ejs-button_button");
+        submit.classList.add("ejs-popup_submit");
         submit.innerText = emu.localization("Submit");
         popup.appendChild(submit);
         addEventListener(submit, "click", (e) => {

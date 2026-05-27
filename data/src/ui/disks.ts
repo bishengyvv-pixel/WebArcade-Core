@@ -2,9 +2,9 @@
 
 export function setupDisksMenu(emu) {
         emu.disksMenu = emu.createElement("div");
-        emu.disksMenu.classList.add("ejs_settings_parent");
+        emu.disksMenu.classList.add("ejs-settings_parent");
         const nested = emu.createElement("div");
-        nested.classList.add("ejs_settings_transition");
+        nested.classList.add("ejs-settings_transition");
         emu.disks = {};
 
         const home = emu.createElement("div");
@@ -28,15 +28,15 @@ export function setupDisksMenu(emu) {
             for (let i = 0; i < menus.length; i++) {
                 menus[i].style["max-height"] = (height - 95) + "px";
             }
-            emu.disksMenu.classList.toggle("ejs_settings_center_left", !onTheRight);
-            emu.disksMenu.classList.toggle("ejs_settings_center_right", onTheRight);
+            emu.disksMenu.classList.toggle("ejs-settings_center_left", !onTheRight);
+            emu.disksMenu.classList.toggle("ejs-settings_center_right", onTheRight);
             if (needChange) {
                 emu.disksMenu.style.display = "none";
                 emu.disksMenu.style.opacity = "";
             }
         }
 
-        home.classList.add("ejs_setting_menu");
+        home.classList.add("ejs-setting_menu");
         nested.appendChild(home);
         let funcs = [];
         emu.changeDiskOption = (title, newValue) => {
@@ -52,13 +52,13 @@ export function setupDisksMenu(emu) {
 
             const current = emu.createElement("div");
             current.innerText = "";
-            current.classList.add("ejs_settings_main_bar_selected");
+            current.classList.add("ejs-settings_main_bar_selected");
             span.appendChild(current);
 
             const menu = emu.createElement("div");
             menus.push(menu);
             menu.setAttribute("hidden", "");
-            menu.classList.add("ejs_parent_option_div");
+            menu.classList.add("ejs-parent_option_div");
             const button = emu.createElement("button");
             const goToHome = () => {
                 const homeSize = emu.getElementSize(home);
@@ -70,15 +70,15 @@ export function setupDisksMenu(emu) {
             emu.addEventListener(button, "click", goToHome);
 
             button.type = "button";
-            button.classList.add("ejs_back_button");
+            button.classList.add("ejs-back_button");
             menu.appendChild(button);
             const pageTitle = emu.createElement("span");
             pageTitle.innerText = title;
-            pageTitle.classList.add("ejs_menu_text_a");
+            pageTitle.classList.add("ejs-menu_text_a");
             button.appendChild(pageTitle);
 
             const optionsMenu = emu.createElement("div");
-            optionsMenu.classList.add("ejs_setting_menu");
+            optionsMenu.classList.add("ejs-setting_menu");
 
             let buttons = [];
             let opts = options;
@@ -93,7 +93,7 @@ export function setupDisksMenu(emu) {
             funcs.push((title) => {
                 if (id !== title) return;
                 for (let j = 0; j < buttons.length; j++) {
-                    buttons[j].classList.toggle("ejs_option_row_selected", buttons[j].getAttribute("ejs_value") === emu.disks[id]);
+                    buttons[j].classList.toggle("ejs-option_row_selected", buttons[j].getAttribute("ejs_value") === emu.disks[id]);
                 }
                 emu.menuOptionChanged(id, emu.disks[id]);
                 current.innerText = opts[emu.disks[id]];
@@ -105,21 +105,21 @@ export function setupDisksMenu(emu) {
                 optionButton.setAttribute("ejs_value", opt);
                 optionButton.type = "button";
                 optionButton.value = opts[opt];
-                optionButton.classList.add("ejs_option_row");
-                optionButton.classList.add("ejs_button_style");
+                optionButton.classList.add("ejs-option_row");
+                optionButton.classList.add("ejs-button_style");
 
                 emu.addEventListener(optionButton, "click", (e) => {
                     emu.disks[id] = opt;
                     for (let j = 0; j < buttons.length; j++) {
-                        buttons[j].classList.remove("ejs_option_row_selected");
+                        buttons[j].classList.remove("ejs-option_row_selected");
                     }
-                    optionButton.classList.add("ejs_option_row_selected");
+                    optionButton.classList.add("ejs-option_row_selected");
                     emu.menuOptionChanged(id, opt);
                     current.innerText = opts[opt];
                     goToHome();
                 })
                 if (defaultOption === opt) {
-                    optionButton.classList.add("ejs_option_row_selected");
+                    optionButton.classList.add("ejs-option_row_selected");
                     emu.menuOptionChanged(id, opt);
                     current.innerText = opts[opt];
                 }

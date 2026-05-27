@@ -27,7 +27,7 @@ export function createControlSettingMenu(emu) {
         }, true);
         emu.setupKeys();
         emu.controlMenu = body.parentElement;
-        body.classList.add("ejs_control_body");
+        body.classList.add("ejs-control_body");
 
         let buttons;
         if ("gb" === emu.getControlScheme()) {
@@ -443,7 +443,7 @@ export function createControlSettingMenu(emu) {
         let playerDivs = [];
 
         const playerSelect = emu.createElement("ul");
-        playerSelect.classList.add("ejs_control_player_bar");
+        playerSelect.classList.add("ejs-control_player_bar");
         for (let i = 1; i < 5; i++) {
             const playerContainer = emu.createElement("li");
             playerContainer.classList.add("tabs-title");
@@ -456,10 +456,10 @@ export function createControlSettingMenu(emu) {
             player.id = "controls-" + (i - 1) + "-label";
             emu.addEventListener(player, "click", (e) => {
                 e.preventDefault();
-                players[selectedPlayer].classList.remove("ejs_control_selected");
+                players[selectedPlayer].classList.remove("ejs-control_selected");
                 playerDivs[selectedPlayer].setAttribute("hidden", "");
                 selectedPlayer = i - 1;
-                players[i - 1].classList.add("ejs_control_selected");
+                players[i - 1].classList.add("ejs-control_selected");
                 playerDivs[i - 1].removeAttribute("hidden");
             })
             playerContainer.appendChild(player);
@@ -478,7 +478,7 @@ export function createControlSettingMenu(emu) {
             gamepadTitle.innerText = emu.localization("Connected Gamepad") + ": ";
 
             const gamepadName = emu.createElement("select");
-            gamepadName.classList.add("ejs_gamepad_dropdown");
+            gamepadName.classList.add("ejs-gamepad_dropdown");
             gamepadName.setAttribute("title", "gamepad-" + i);
             gamepadName.setAttribute("index", i);
             emu.gamepadLabels.push(gamepadName);
@@ -504,7 +504,7 @@ export function createControlSettingMenu(emu) {
             def.innerText = "Not Connected";
             gamepadName.appendChild(def);
             gamepadTitle.appendChild(gamepadName);
-            gamepadTitle.classList.add("ejs_gamepad_section");
+            gamepadTitle.classList.add("ejs-gamepad_section");
 
             const leftPadding = emu.createElement("div");
             leftPadding.style = "width:25%;float:left;";
@@ -541,8 +541,8 @@ export function createControlSettingMenu(emu) {
             if ((emu.touch || emu.hasTouchScreen) && i === 0) {
                 const vgp = emu.createElement("div");
                 vgp.style = "width:25%;float:right;clear:none;padding:0;font-size: 11px;padding-left: 2.25rem;";
-                vgp.classList.add("ejs_control_row");
-                vgp.classList.add("ejs_cheat_row");
+                vgp.classList.add("ejs-control_row");
+                vgp.classList.add("ejs-cheat_row");
                 const input = emu.createElement("input");
                 input.type = "checkbox";
                 input.checked = true;
@@ -578,7 +578,7 @@ export function createControlSettingMenu(emu) {
                 buttonText.setAttribute("data-index", i);
                 buttonText.setAttribute("data-label", controlLabel);
                 buttonText.style = "margin-bottom:10px;";
-                buttonText.classList.add("ejs_control_bar");
+                buttonText.classList.add("ejs-control_bar");
 
                 const title = emu.createElement("div");
                 title.style = "width:25%;float:left;font-size:12px;";
@@ -657,7 +657,7 @@ export function createControlSettingMenu(emu) {
                 const setButton = emu.createElement("div");
                 setButton.style = "width:15%;float:left;";
                 const button = emu.createElement("a");
-                button.classList.add("ejs_control_set_button");
+                button.classList.add("ejs-control_set_button");
                 button.innerText = emu.localization("Set");
                 setButton.appendChild(button);
 
@@ -726,18 +726,18 @@ export function createControlSettingMenu(emu) {
         body.appendChild(controls);
 
         selectedPlayer = 0;
-        players[0].classList.add("ejs_control_selected");
+        players[0].classList.add("ejs-control_selected");
         playerDivs[0].removeAttribute("hidden");
 
         const popup = emu.createElement("div");
-        popup.classList.add("ejs_popup_container");
+        popup.classList.add("ejs-popup_container");
         const popupMsg = emu.createElement("div");
         emu.addEventListener(popup, "mousedown click touchstart", (e) => {
             if (emu.isChild(popupMsg, e.target)) return;
             emu.controlPopup.parentElement.parentElement.setAttribute("hidden", "");
         })
         const btn = emu.createElement("a");
-        btn.classList.add("ejs_control_set_button");
+        btn.classList.add("ejs-control_set_button");
         btn.innerText = emu.localization("Clear");
         emu.addEventListener(btn, "mousedown click touchstart", (e) => {
             const num = emu.controlPopup.getAttribute("button-num");
@@ -751,7 +751,7 @@ export function createControlSettingMenu(emu) {
             emu.checkGamepadInputs();
             emu.saveSettings();
         })
-        popupMsg.classList.add("ejs_popup_box");
+        popupMsg.classList.add("ejs-popup_box");
         popupMsg.innerText = "";
         popup.setAttribute("hidden", "");
         const popMsg = emu.createElement("div");
